@@ -1,8 +1,6 @@
 from tkinter import *
-from GUI import *
 from GUI.WordsWindow import *
 from GUI.StartLearning import *
-from Logic import Logic
 
 
 class MainWindow(WordsWindow, StartLearning):
@@ -31,6 +29,7 @@ class MainWindow(WordsWindow, StartLearning):
         return "{}x{}+{}+{}".format(window_width, window_height, position_right, position_down)
 
     def set_buttons(self):
+        #Set two button
         self.add_words = Button(self.root, text="Add new words list", bd=5,
                                 command=lambda: self.words_window.add_words_window(self.root))
         self.start_learning = Button(self.root, text="Start learning", bd=5)
