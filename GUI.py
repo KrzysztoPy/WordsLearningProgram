@@ -61,11 +61,6 @@ class MainWindow(Logic):
         self.root.deiconify()
 
 
-# class WordsWindow(MainWindow):
-#     def __init__(self,MainWindow):
-#         self.mainwindow
-
-
 def main():
     gui = MainWindow()
     gui.main_menu()
