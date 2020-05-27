@@ -1,4 +1,5 @@
 from tkinter import *
+
 from GUI.WordsWindow import *
 from GUI.StartLearning import *
 
@@ -29,13 +30,15 @@ class MainWindow(WordsWindow, StartLearning):
         return "{}x{}+{}+{}".format(window_width, window_height, position_right, position_down)
 
     def set_buttons(self):
-        #Set two button
+        # Set two button
         self.add_words = Button(self.root, text="Add new words list", bd=5,
-                                command=lambda: self.words_window.add_words_window(self.root))
+                                command=lambda: self.words_window.words_window_main(self.root))
         self.start_learning = Button(self.root, text="Start learning", bd=5)
 
         self.add_words.grid(row=0, column=1, ipadx=25, pady=25)
         self.start_learning.grid(row=0, column=2, ipadx=40, pady=25)
+
+
 
 
 def main():
