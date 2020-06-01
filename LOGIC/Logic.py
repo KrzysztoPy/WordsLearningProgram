@@ -83,12 +83,14 @@ class Logic:
         if file_name == "":
             return ["Error", "File name can't be empty."]
         elif file_name == ".txt":
-            return ["Error", "Prohibited file name: .txt."]
+            return ["Error", "Prohibited file name: .txt"]
         file_path = self.wordslist_path() + "\\" + self.check_have_txt(file_name)
         if os.path.exists(file_path):
             return ["Error", "A file with this name already exists.Choice different name. "]
         else:
             return self.create_file(self.check_have_txt(file_name))
+
+
 
 
 def test():
