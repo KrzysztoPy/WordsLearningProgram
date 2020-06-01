@@ -102,9 +102,9 @@ class Logic:
         flag = FALSE
         # dom,ojczyzna|home
         print(file_data.__len__())
-        for i in file_data.__len__():  # Błąd nie wchodzi do fora sprawdzić
+        for i in range(0, file_data.__len__()):  # Błąd nie wchodzi do fora sprawdzić
             polish_words, english_words = ""
-            for j in words_list[i]:
+            for j in words_list:
                 if j != "|" and flag == FALSE:
                     if j == ",":
                         polish_words += j + " "
