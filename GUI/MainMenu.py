@@ -39,8 +39,6 @@ class MainWindow(WordsWindow, StartLearning):
         self.start_learning.grid(row=0, column=2, ipadx=40, pady=25)
 
 
-
-
 def main():
     gui = MainWindow()
     gui.main_menu()

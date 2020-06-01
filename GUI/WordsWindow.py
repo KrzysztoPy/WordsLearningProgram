@@ -6,17 +6,24 @@ from LOGIC.Logic import *
 class WordsWindow(Logic):
     logic = Logic()
 
+    # Main root and top window root
     main_root = None
     words_window_root = None
 
     # Entry field // take name directory
-    field_file_name = None
+    file_name = None
 
     # Variable for test
     listbox_with_folder = None
 
+    file_list = None
+
+    clicked_file = None
+    choice_file = None
+
+    # Set position and size all windows
     def set_main_pop(self, main_root) -> str:
-        # Set size view window
+        # Default window size
         window_width = 1200
         window_height = 600
         # Set center position
@@ -24,6 +31,7 @@ class WordsWindow(Logic):
         position_down = int(main_root.winfo_screenheight() / 2 - window_height / 2)
         return "{}x{}+{}+{}".format(window_width, window_height, position_right, position_down)
 
+    # Main method create top window
     def words_window_main(self, root):
         self.main_root = root
         # Create new top pop
@@ -32,17 +40,27 @@ class WordsWindow(Logic):
         self.words_window_root.geometry(self.set_main_pop(self.main_root))
         # Main pop set invisible
         self.main_root.withdraw()
+
+        self.logic.create_directory()
+
+        #
         self.words_window_label()
         self.words_window_in_field()
+
         self.words_window_button()
+        self.option_menu()
 
         # Set windows close event
         self.words_window_root.protocol("WM_DELETE_WINDOW", self.close_words_window)
 
+    # set all button
     def words_window_button(self):
+
         butt_save = Button(self.words_window_root, text="Save",
-                           command=lambda: self.info_popup(self.logic.dir_name_is_empty(self.field_file_name.get())))
+                           command=lambda: [self.info_popup(self.logic.file_create(self.file_name.get()))
+                               , self.logic.file_list(), self.option_menu()])
         butt_save.grid(row=1, column=2, ipadx=70, pady=0)
+        self.words_window_root.grid_columnconfigure(butt_save, minsize=1)
 
         butt_load = Button(self.words_window_root, text="Load")
         butt_load.grid(row=1, column=4, ipadx=70, pady=0)
@@ -60,9 +78,11 @@ class WordsWindow(Logic):
         butt_back = Button(self.words_window_root, text="Back", command=self.close_words_window)
         butt_back.grid(row=5, column=0, ipadx=25, pady=25)
 
+    # set all field
     def words_window_in_field(self):
-        self.field_file_name = Entry(self.words_window_root, width=25, bd=5)
-        self.field_file_name.grid(row=1, column=1, ipadx=25, pady=25)
+
+        self.file_name = Entry(self.words_window_root, width=25, bd=5)
+        self.file_name.grid(row=1, column=1, ipadx=25, pady=25)
 
         polish_word = Entry(self.words_window_root, width=25, bd=5)
         polish_word.grid(row=2, column=1, ipadx=25, pady=25)
@@ -70,13 +90,15 @@ class WordsWindow(Logic):
         english_word = Entry(self.words_window_root, width=25, bd=5)
         english_word.grid(row=2, column=3, ipadx=25, pady=25)
 
+    # Set all label
     def words_window_label(self):
-        lab_name_fail = Label(self.words_window_root, text="Enter the file name: ")
-        lab_name_fail.grid(row=1, column=0)
+        currently_open_file = Label(self.words_window_root,
+                                    text="Directory with word lists {}  ".format(self.logic.dir_name),
+                                    fg="red", font='Helvetica 15 bold', padx=2)
+        currently_open_file.grid(row=0, column=0, columnspan=6)
 
-        currently_open_file = Label(self.words_window_root, text="Currently choice file: None  ",
-                                    fg="red", font='Helvetica 13 bold', padx=2)
-        currently_open_file.grid(row=0, column=1)
+        label_set_name_file = Label(self.words_window_root, text="Choice words list name ")
+        label_set_name_file.grid(row=1, column=0)
 
         lab_polish_word = Label(self.words_window_root, text="Polish word version:")
         lab_polish_word.grid(row=2, column=0)
@@ -84,18 +106,26 @@ class WordsWindow(Logic):
         lab_english_word = Label(self.words_window_root, text="English word version:")
         lab_english_word.grid(row=2, column=2)
 
-    # Get list with 2 elem:
-    # First: Messagebox type
-    # Second: How text view
+        lab_english_word = Label(self.words_window_root, text="Selected file")
+        lab_english_word.grid(row=0, column=4)
+
+    # Give possibility to choice
+    def option_menu(self):
+        self.file_list = self.logic.file_list()
+        self.clicked_file = StringVar()
+        self.clicked_file.set(self.file_list[0])
+
+        self.choice_file = OptionMenu(self.words_window_root, self.clicked_file,
+                                      *self.file_list)
+        self.choice_file.grid(row=1, column=3, ipadx=65)
+
     def info_popup(self, info_list):
         if info_list[0] == "Error":
             messagebox.showerror(info_list[0], info_list[1])
             pass
         elif info_list[0] == "Information":
+            self.option_menu()
             messagebox.showinfo(info_list[0], info_list[1])
-
-    def set_combobox(self):
-        combobox_folder_list = OptionMenu()
 
     def close_words_window(self):
         self.words_window_root.destroy()
