@@ -98,31 +98,78 @@ class Logic:
         return self.set_words_from_file(file_data)
 
     def set_words_from_file(self, file_data):
+
         words_list = []
         flag = FALSE
+        polish_words = ""
+        english_words = ""
         # dom,ojczyzna|home
-        print(file_data.__len__())
-        for i in range(0, file_data.__len__()):  # Błąd nie wchodzi do fora sprawdzić
-            polish_words, english_words = ""
-            for j in words_list:
-                if j != "|" and flag == FALSE:
-                    if j == ",":
-                        polish_words += j + " "
-                    else:
-                        polish_words += j
-                elif j == "|":
-                    flag = TRUE
-                elif j != "|" and flag == True:
-                    if j == ",":
-                        english_words += j + " "
-                    else:
-                        english_words += j
-                words_list += [i, polish_words, english_words]
+        counter = 1
+        for j in file_data:
+            if j != "|" and flag == FALSE and j != ";":
+                if j == ",":
+                    polish_words += j + " "
+                else:
+                    polish_words += j
+            elif j == "|":
+                flag = TRUE
+            elif j != "|" and flag == True and j != ";":
+                if j == ",":
+                    english_words += j + " "
+                else:
+                    english_words += j
+            elif j == ";":
+                words_list += [counter, polish_words, english_words]
+                counter += 1
+                flag = FALSE
+                polish_words = ""
+                english_words = ""
         return words_list.copy()
+
+    def check_polish_entry(self, polish_word):
+        pass
+
+    def check_english_entry(self, english_word):
+        pass
+
+    def add_word(self, polish_word, english_word, tmp_actual_words):
+        if polish_word == "":
+            return ["Error", "Musisz wpisać polską wersje słowa."]
+        elif english_word == "":
+            return ["Error", "You must writing english word version."]
+        return self.check_change(polish_word, english_word, tmp_actual_words)
+
+    def check_change(self, polish_word, english_word, tmp_actual_words):
+
+        return self.save_to_table(polish_word, english_word, tmp_actual_words)
+
+    def save_to_table(self, polish_word, english_word, tmp_actual_words):
+        tmp_words = []
+        index = 0
+
+        if tmp_actual_words.__len__() > 3:
+            index = int(tmp_actual_words[tmp_actual_words.__len__() - 3])
+            for i in range(0, tmp_actual_words.__len__(), 3):
+                tmp_words.append(tmp_actual_words[i])
+                tmp_words.append(tmp_actual_words[i + 1])
+                tmp_words.append(tmp_actual_words[i + 2])
+
+        tmp_words.append(index + 1)
+        tmp_words.append(polish_word)
+        tmp_words.append(english_word)
+        return ["Save", "The word has been added to the list", tmp_words]
+
+    def remove_word(self):
+        pass
+
+    def find_word(self):
+        pass
 
 
 def test():
-    # logic = Logic()
+    logic = Logic()
+    # # rano|a.m.;około|about;
+    logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
     # logic.load_butt("bla.txt")
     # path = os.path.realpath(__file__)
     # print(os.path.basename(__file__))

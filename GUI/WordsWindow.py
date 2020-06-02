@@ -21,7 +21,13 @@ class WordsWindow(Logic):
     clicked_file = None
     choice_file = None
 
+    # Variable for table
     table = None
+    # Stores all words from load file
+    actual_words = []
+    # Entry filed with polish and english word
+    polish_word = None
+    english_word = None
 
     # Set position and size all windows
     def set_main_pop(self, main_root) -> str:
@@ -64,20 +70,24 @@ class WordsWindow(Logic):
         butt_save.grid(row=1, column=2, ipadx=70, pady=0)
         self.words_window_root.grid_columnconfigure(butt_save, minsize=1)
 
-        butt_load = Button(self.words_window_root, text="Load", command=lambda: self.set_value_table(self.logic.load_butt(self.clicked_file.get())))
+        butt_load = Button(self.words_window_root, text="Load",
+                           command=lambda: [self.set_table(),
+                                            self.set_value_table(self.logic.load_butt(self.clicked_file.get()))])
         butt_load.grid(row=1, column=4, ipadx=70, pady=0)
         self.words_window_root.grid_columnconfigure(butt_load, minsize=1)
 
         butt_save = Button(self.words_window_root, text="Save words")  # Without command!!!
         butt_save.grid(row=4, column=4, ipadx=70, pady=0)
 
-        butt_add = Button(self.words_window_root, text="Add")
+        butt_add = Button(self.words_window_root, text="Add",
+                          command=lambda: self.info_popup(
+                              self.logic.add_word(self.polish_word.get(), self.english_word.get(), self.actual_words)))
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
 
-        butt_remove = Button(self.words_window_root, text="Remove")
+        butt_remove = Button(self.words_window_root, text="Remove", command=self.logic.remove_word)
         butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
 
-        butt_find = Button(self.words_window_root, text="Find")
+        butt_find = Button(self.words_window_root, text="Find", command=self.logic.find_word)
         butt_find.grid(row=2, column=6, ipadx=10, pady=25)
 
         butt_back = Button(self.words_window_root, text="Back", command=self.close_words_window)
@@ -89,11 +99,11 @@ class WordsWindow(Logic):
         self.file_name = Entry(self.words_window_root, width=25, bd=5)
         self.file_name.grid(row=1, column=1, ipadx=25, pady=25)
 
-        polish_word = Entry(self.words_window_root, width=25, bd=5)
-        polish_word.grid(row=2, column=1, ipadx=25, pady=25)
+        self.polish_word = Entry(self.words_window_root, width=25, bd=5)
+        self.polish_word.grid(row=2, column=1, ipadx=25, pady=25)
 
-        english_word = Entry(self.words_window_root, width=25, bd=5)
-        english_word.grid(row=2, column=3, ipadx=25, pady=25)
+        self.english_word = Entry(self.words_window_root, width=25, bd=5)
+        self.english_word.grid(row=2, column=3, ipadx=25, pady=25)
 
     # Set all label
     def words_window_label(self):
@@ -135,10 +145,16 @@ class WordsWindow(Logic):
 
     def set_value_table(self, words):
         # [[x,y,x],[x,y,z]]
-        for i in words:
-            self.table.insert("", 'end', text="L1", values=(i[0], i[1], i[2]))
+        counter = 0
+        self.actual_words = []
+        for i in range(0, words.__len__(), 3):
+            self.table.insert("", 'end', values=(words[i], words[i + 1], words[i + 2]))
+            self.actual_words.append(words[i])
+            self.actual_words.append(words[i + 1])
+            self.actual_words.append(words[i + 2])
 
-    # Give possibility to choice
+            # Give possibility to choice
+
     def option_menu(self):
         self.file_list = self.logic.file_list()
         self.clicked_file = StringVar()
@@ -148,12 +164,16 @@ class WordsWindow(Logic):
                                       *self.file_list)
         self.choice_file.grid(row=1, column=3, ipadx=65)
 
+    # Remember add_butt command return give 3 variable [type pop, information, new words list]
     def info_popup(self, info_list):
         if info_list[0] == "Error":
             messagebox.showerror(info_list[0], info_list[1])
             pass
         elif info_list[0] == "Information":
             self.option_menu()
+            messagebox.showinfo(info_list[0], info_list[1])
+        elif info_list[0] == "Save":
+            self.set_value_table(info_list[2])
             messagebox.showinfo(info_list[0], info_list[1])
 
     def close_words_window(self):
