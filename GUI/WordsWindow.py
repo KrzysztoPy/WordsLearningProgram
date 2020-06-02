@@ -173,6 +173,7 @@ class WordsWindow(Logic):
             self.option_menu()
             messagebox.showinfo(info_list[0], info_list[1])
         elif info_list[0] == "Save":
+            self.set_table()
             self.set_value_table(info_list[2])
             messagebox.showinfo(info_list[0], info_list[1])
 
