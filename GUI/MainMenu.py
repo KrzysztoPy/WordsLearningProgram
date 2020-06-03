@@ -1,12 +1,14 @@
 from tkinter import *
 
+from LOGIC.MenuLogic import MenuLogic
 from GUI.WordsWindow import *
 from GUI.StartLearning import *
 
 
-class MainWindow(WordsWindow, StartLearning):
+class MainWindow(WordsWindow, StartLearning, MenuLogic):
     words_window = WordsWindow()
     learning_window = StartLearning()
+    menu_logic = MenuLogic()
 
     root = Tk()
     add_words = None
@@ -16,7 +18,7 @@ class MainWindow(WordsWindow, StartLearning):
         self.root.title("Words learning")
         self.root.geometry(self.set_main_pop(335, 75))
         self.root.resizable(width=False, height=False)
-
+        self.menu_logic.create_words_list_dir()
         self.set_buttons()
         self.root.mainloop()
 

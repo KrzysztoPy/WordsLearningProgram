@@ -1,6 +1,5 @@
 from LOGIC.LearningLogic import *
 from tkinter import *
-from termcolor import colored
 
 
 class StartLearning(LearningLogic):
@@ -10,6 +9,9 @@ class StartLearning(LearningLogic):
     main_root = None
     # StartLearning root
     learning_root = None
+
+    words_list = []
+    sent_list = []
 
     # Main def
     def start_learning_menu(self, root):
@@ -63,6 +65,11 @@ class StartLearning(LearningLogic):
         empty_after_report_label = Label(self.learning_root, text="")
         empty_after_report_label.grid(row=15, column=0, ipadx=65)
         # /#
+
+        set_file = Label(self.learning_root, font='Helvetica 11 bold', text="Choice words list name ")
+        set_file.grid(row=2, column=1)
+        set_file = Label(self.learning_root, font='Helvetica 11 bold', text="Choice words list name ")
+        set_file.grid(row=2, column=3)
 
         set_file = Label(self.learning_root, font='Helvetica 11 bold', text="Choice words list name ")
         set_file.grid(row=0, column=1)

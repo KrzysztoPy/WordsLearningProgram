@@ -34,3 +34,6 @@ class LearningLogic:
         if self.file_list.__len__() == 0:
             self.file_list.append("Empty")
         return self.file_list
+
+    def load_file_butt(self):
+        pass
