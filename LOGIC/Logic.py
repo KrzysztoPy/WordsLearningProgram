@@ -94,7 +94,8 @@ class Logic:
     def load_butt(self, file_name):
         tmp_path = self.words_list_path() + "\\" + file_name
         list_words = open(tmp_path, "r", encoding="utf=8")
-        file_data = list_words.read()
+        tmp = list_words.read()
+        file_data = "".join(tmp.split())
         return self.set_words_from_file(file_data)
 
     def set_words_from_file(self, file_data):

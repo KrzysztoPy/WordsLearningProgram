@@ -5,13 +5,12 @@ from GUI.StartLearning import *
 
 
 class MainWindow(WordsWindow, StartLearning):
-    start_learning = StartLearning()
+    words_window = WordsWindow()
+    learning_window = StartLearning()
+
     root = Tk()
     add_words = None
-    start_learning = None
     add_words_pop = None
-
-    words_window = WordsWindow()
 
     def main_menu(self):
         self.root.title("Words learning")
@@ -33,9 +32,11 @@ class MainWindow(WordsWindow, StartLearning):
         # Set two button
         self.add_words = Button(self.root, text="Add new words list", bd=5,
                                 command=lambda: self.words_window.words_window_main(self.root))
-        self.start_learning = Button(self.root, text="Start learning", bd=5)
-
         self.add_words.grid(row=0, column=1, ipadx=25, pady=25)
+
+        self.start_learning = Button(self.root, text="Start learning", bd=5,
+                                     command=lambda: self.learning_window.start_learning_menu(self.root))
+
         self.start_learning.grid(row=0, column=2, ipadx=40, pady=25)
 
 
