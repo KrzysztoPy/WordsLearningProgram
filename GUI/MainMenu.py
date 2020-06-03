@@ -16,6 +16,7 @@ class MainWindow(WordsWindow, StartLearning):
         self.root.title("Words learning")
         self.root.geometry(self.set_main_pop(335, 75))
         self.root.resizable(width=False, height=False)
+
         self.set_buttons()
         self.root.mainloop()
 
