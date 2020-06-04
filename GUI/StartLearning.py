@@ -18,12 +18,28 @@ class StartLearning(LearningLogic):
     version_label_text = None
     word_sent_version_chose = None
 
+    view_word_label = None
+
+    # changed Label Words and Correct
+    quest_word = None
+    text_quest_word = None
+    correct_answer = None
+    text_correct_answer = None
+    # StringVar fill OptionMenu
+    clicked_file = None
+    # List with external words
+    external_words = None
+    # Global set entry
+    entry_polish_word = None
+    entry_english_word = None
+
     # Main def
     def start_learning_menu(self, root):
         # set var root from main root
         self.main_root = root
 
         self.version_label_text = StringVar()
+        self.view_word_label = StringVar()
 
         self.learning_root = Toplevel(self.main_root)
         # Set window size
@@ -46,10 +62,10 @@ class StartLearning(LearningLogic):
 
     def learning_combo_box(self):
         file_lists = self.l_logic.file_list()
-        clicked_file = StringVar()
-        clicked_file.set(file_lists[0])
+        self.clicked_file = StringVar()
+        self.clicked_file.set(file_lists[0])
 
-        choice_file = OptionMenu(self.learning_root, clicked_file, *file_lists)
+        choice_file = OptionMenu(self.learning_root, self.clicked_file, *file_lists)
         choice_file.grid(row=1, column=0, ipadx=65)
 
     def learning_label(self):
@@ -80,6 +96,9 @@ class StartLearning(LearningLogic):
         empty_after_report_label.grid(row=14, column=0, ipadx=65)
         empty_after_report_label = Label(self.learning_root, text="")
         empty_after_report_label.grid(row=15, column=0, ipadx=65)
+
+        label_text_word = Label(self.learning_root, font='Helvetica 11 bold', text="")
+        label_text_word.grid(row=4, column=1, columnspan=2)
         # /#
 
         set_file = Label(self.learning_root, font='Helvetica 11 bold', text="Choice words list name ")
@@ -94,11 +113,11 @@ class StartLearning(LearningLogic):
         self.word_sent_version_chose.grid(row=1, column=3)
 
         # From file text word
-        file_words_label = Label(self.learning_root, font='Helvetica 11 bold', text="Words: ")
-        file_words_label.grid(row=4, column=1)
+        label_text_word = Label(self.learning_root, font='Helvetica 11 bold', text="Words: ")
+        label_text_word.grid(row=4, column=0)
 
-        file_get_words_label = Label(self.learning_root, fg="green", font='Helvetica 11 bold', text="No list selected ")
-        file_get_words_label.grid(row=4, column=2)
+        self.correct_answer = Label(self.learning_root, fg="green", font='Helvetica 11 bold', text="Correct answer: ")
+        self.correct_answer.grid(row=4, column=3)
         # /#
 
         # Words label
@@ -169,29 +188,34 @@ class StartLearning(LearningLogic):
                                              textvariable=self.version_label_text)
         self.word_sent_version_chose.grid(row=1, column=3)
 
-        # word_sent_version_chose = Label(self.learning_root, font='Helvetica 11 bold',
-        #                                 textvariable=self.version_label_text)
-        # word_sent_version_chose.grid(row=1, column=3)
+        # From file text word
 
-        # set_file = Label(self.learning_root, font='Helvetica 11 bold', text="No list selected")
-        # set_file.grid(row=4, column=1)
-        #
-        # set_file = Label(self.learning_root, font='Helvetica 11 bold', text="Sentence: ")
-        # set_file.grid(row=0, column=1)
+    def word_label(self):
+        # From file text word
+        self.quest_word = Label(self.learning_root, font='Helvetica 11 bold', fg="dark blue",
+                                textvariable=self.view_word_label)
+        self.quest_word.grid(row=4, column=1, columnspan=2)
+        # self.correct_answer = Label(self.learning_root, fg="green", font='Helvetica 11 bold', text="Correct answer: ")
+        # self.correct_answer.grid(row=4, column=2)
 
     def learning_butt(self):
-        butt_load = Button(self.learning_root, font='Helvetica 11 bold', text="Load")
-        # ,command=lambda: [self.set_table(),self.set_value_table(self.logic.load_butt(self.clicked_file.get()))])
+        butt_load = Button(self.learning_root, font='Helvetica 11 bold', text="Load",
+                           command=lambda: [
+                               self.view_word_label.set(self.l_logic.load_file_butt(self.clicked_file.get())),
+                               self.word_label()])
         butt_load.grid(row=1, column=1, ipadx=70, pady=0)
 
         version_butt = Button(self.learning_root, font='Helvetica 11 bold', text="Change",
-                              command=lambda: [self.version_label_text.set(self.l_logic.set_version_label()),
-                                               self.variable_labels()])
+                              command=lambda:
+                              [self.version_label_text.set(self.l_logic.set_version_label()),
+                               self.variable_labels()])
 
         # ,command=lambda: [self.set_table(),self.set_value_table(self.logic.load_butt(self.clicked_file.get()))])
         version_butt.grid(row=1, column=4, ipadx=70, pady=0)
 
-        butt_word_check = Button(self.learning_root, font='Helvetica 11 bold', text="Words Check")
+        butt_word_check = Button(self.learning_root, font='Helvetica 11 bold', text="Words Check",
+                                 command=lambda: self.l_logic.check_button(self.entry_polish_word.get(),
+                                                                           self.entry_english_word.get()))
         # ,command=lambda: [self.set_table(),self.set_value_table(self.logic.load_butt(self.clicked_file.get()))])
         butt_word_check.grid(row=5, column=4, ipadx=70, pady=0)
 
@@ -207,11 +231,11 @@ class StartLearning(LearningLogic):
 
     def learning_field(self):
         # Words Label
-        entry_polish_word = Entry(self.learning_root, width=25, bd=5)
-        entry_polish_word.grid(row=5, column=1, ipadx=25, pady=25)
+        self.entry_polish_word = Entry(self.learning_root, width=25, bd=5)
+        self.entry_polish_word.grid(row=5, column=1, ipadx=25, pady=25)
 
-        entry_english_word = Entry(self.learning_root, width=25, bd=5)
-        entry_english_word.grid(row=5, column=3, ipadx=25, pady=25)
+        self.entry_english_word = Entry(self.learning_root, width=25, bd=5)
+        self.entry_english_word.grid(row=5, column=3, ipadx=25, pady=25)
         # /#
 
         entry_polish_sentence = Entry(self.learning_root, width=25, bd=5)

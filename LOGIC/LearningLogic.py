@@ -1,4 +1,5 @@
 import os
+from random import randint
 
 
 class LearningLogic:
@@ -10,6 +11,16 @@ class LearningLogic:
     # Button English/Polish version
     label_version = ["English version", "Polish version"]
     label_version_flag = False
+
+    # words list
+    ext_word_list = None
+    actual_language_version = label_version[1]
+
+    # Stores all words from file
+    all_words_list = None
+    all_words_list_copy = None
+    # Actual get word
+    actual_word = None
 
     def set_main_pop(self, main_root):
         # Default window size
@@ -39,16 +50,94 @@ class LearningLogic:
             self.file_list.append("Empty")
         return self.file_list
 
-    def set_version_label(self) -> str:
+    def set_version_label(self):
         if not self.label_version_flag:
             self.label_version_flag = True
+            self.actual_language_version = self.label_version[0]
             return self.label_version[0]
         elif self.label_version_flag:
             self.label_version_flag = False
+            self.actual_language_version = self.label_version[1]
             return self.label_version[1]
 
-    def load_file_butt(self):
-        pass
+    def load_file_butt(self, file_name) -> str:
+
+        tmp_path = self.list_path() + "\\" + file_name
+        list_words = open(tmp_path, "r", encoding="utf=8")
+        tmp = list_words.read()
+        read_data = "".join(tmp.split())
+        return str(self.set_words(read_data))
+
+    def set_words(self, file_data):
+
+        words_list = []
+        flag = False
+        polish_words = ""
+        english_words = ""
+        # dom,ojczyzna|home
+        for j in file_data:
+            if j != "|" and flag == False and j != ";":
+                if j == ",":
+                    polish_words += j + " "
+                else:
+                    polish_words += j
+            elif j == "|":
+                flag = True
+            elif j != "|" and flag == True and j != ";":
+                if j == ",":
+                    english_words += j + " "
+                else:
+                    english_words += j
+            elif j == ";":
+                words_list.append([polish_words, english_words, 0, 0, 0])
+                flag = False
+                polish_words = ""
+                english_words = ""
+            self.all_words_list = words_list.copy()
+
+        return self.mixing_words(words_list.copy())
+
+    def mixing_words(self, words_list):
+        new_words_list = []
+        size_list = words_list.__len__()
+        for i in range(0, words_list.__len__()):
+            draw_choose = randint(0, words_list.__len__() - 1)
+            new_words_list.append(words_list[draw_choose].copy())
+            words_list.pop(draw_choose)
+            size_list -= 1
+        self.all_words_list_copy = new_words_list.copy()
+
+        self.actual_word = self.all_words_list_copy[0]
+        self.all_words_list_copy[0].pop()
+
+        if self.actual_language_version == "Polish version":
+
+            return self.actual_word[0]
+        elif self.actual_language_version == "English version":
+            return self.actual_word[1]
+
+    def check_button(self, polish_entry, english_entry):
+        polish_entry = "".join(polish_entry).replace(" ", "")
+        english_entry = "".join(english_entry).replace(" ", "")
+
+        if self.actual_language_version == "Polish version":
+            if english_entry == "".join(self.actual_word[1].split()):
+                print("Dobre słowo po Angielsku")
+                pass
+            else:
+                print("Złe słowo po Angielsku")
+                pass
+        elif self.actual_language_version == "English version":
+            # tmp = "".join(polish_entry).replace(" ", "")
+            # tmp1 = "".join(self.actual_word[0].split())
+            # print(tmp)
+            # print(tmp1)
+            if polish_entry == "".join(self.actual_word[0].split()):
+                print("Dobre słowo po Polsku")
+                pass
+            else:
+                print("Złe słowo po Polsku")
+                pass
 
     def close_Learning_window(self):
         self.words_window_root.destroy()
