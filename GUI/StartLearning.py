@@ -208,7 +208,7 @@ class StartLearning(LearningLogic):
         version_butt = Button(self.learning_root, font='Helvetica 11 bold', text="Change",
                               command=lambda:
                               [self.version_label_text.set(self.l_logic.set_version_label()),
-                               self.variable_labels()])
+                               self.variable_labels(), self.view_word_label.set(self.l_logic.change_butt_mixing())])
 
         # ,command=lambda: [self.set_table(),self.set_value_table(self.logic.load_butt(self.clicked_file.get()))])
         version_butt.grid(row=1, column=4, ipadx=70, pady=0)

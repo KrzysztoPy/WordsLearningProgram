@@ -14,13 +14,14 @@ class LearningLogic:
 
     # words list
     ext_word_list = None
-    actual_language_version = label_version[1]
+    actual_language_version = label_version[0]
 
     # Stores all words from file
     all_words_list = None
     all_words_list_copy = None
     # Actual get word
     actual_word = None
+    number_word = 0
 
     def set_main_pop(self, main_root):
         # Default window size
@@ -51,6 +52,7 @@ class LearningLogic:
         return self.file_list
 
     def set_version_label(self):
+        self.number_word = 0
         if not self.label_version_flag:
             self.label_version_flag = True
             self.actual_language_version = self.label_version[0]
@@ -97,6 +99,9 @@ class LearningLogic:
 
         return self.mixing_words(words_list.copy())
 
+    def change_butt_mixing(self):
+        return self.mixing_words(self.all_words_list.copy())
+
     def mixing_words(self, words_list):
         new_words_list = []
         size_list = words_list.__len__()
@@ -117,8 +122,10 @@ class LearningLogic:
             return self.actual_word[1]
 
     def check_button(self, polish_entry, english_entry):
-        polish_entry = "".join(polish_entry).replace(" ", "")
-        english_entry = "".join(english_entry).replace(" ", "")
+        if self.actual_language_version == "English version":
+            polish_entry = "".join(polish_entry).replace(" ", "")
+        elif self.actual_language_version == "Polish version":
+            english_entry = "".join(english_entry).replace(" ", "")
 
         if self.actual_language_version == "Polish version":
             if english_entry == "".join(self.actual_word[1].split()):
