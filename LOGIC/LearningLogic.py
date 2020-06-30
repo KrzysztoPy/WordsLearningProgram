@@ -156,9 +156,11 @@ class LearningLogic:
     def load_next_word(self):
         self.actual_translate_word = self.all_words_mix_list[self.number_word]
         if self.actual_language_version == "Polish version":
-            return self.actual_choice_word[1]
+            print(self.actual_translate_word[1])
+            return self.actual_translate_word[1]
         elif self.actual_language_version == "English version":
-            return self.actual_choice_word[0]
+            print(self.actual_translate_word[0])
+            return self.actual_translate_word[0]
 
     def set_label_text_curr_ans(self):
         if self.all_words_list:
