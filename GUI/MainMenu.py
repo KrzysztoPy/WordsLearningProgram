@@ -2,12 +2,12 @@ from tkinter import *
 
 from LOGIC.MenuLogic import MenuLogic
 from GUI.WordsWindow import *
-from GUI.StartLearning import *
+from GUI.GuiLearning import *
 
 
-class MainWindow(WordsWindow, StartLearning, MenuLogic):
+class MainWindow(WordsWindow, GuiLearning, MenuLogic):
     words_window = WordsWindow()
-    learning_window = StartLearning()
+    learning_window = GuiLearning()
     menu_logic = MenuLogic()
 
     root = Tk()
