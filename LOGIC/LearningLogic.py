@@ -3,6 +3,16 @@ from random import randint
 
 
 class LearningLogic:
+    POLISH_VERSION = "Polish version"
+    ENGLISH_VERSION = "English version"
+
+    # Raport variable
+    words_counter = 0
+    words_correctly = 0
+    words_incorrectly = 0
+    # Correct answer
+    curr_ans = None
+
     # Variable with all file list
     file_list = None
     # Directory name where is all file
@@ -22,6 +32,9 @@ class LearningLogic:
     # Actual get word
     actual_choice_word = None
     number_word = 0
+
+    code_end = "Error 404"
+    end_words = "End of words"
 
     def set_main_pop(self, main_root):
         # Default window size
@@ -54,7 +67,10 @@ class LearningLogic:
     def set_version_label(self):
         # Sets again pointer to first word
         self.number_word = 0
-
+        self.words_correctly = 0
+        self.words_incorrectly = 0
+        self.curr_ans = ""
+    def change_language(self):
         if not self.label_version_flag:
             self.label_version_flag = True
             self.actual_language_version = self.label_version[0]
@@ -68,12 +84,13 @@ class LearningLogic:
         tmp_path = self.list_path() + "\\" + file_name
         list_words = open(tmp_path, "r", encoding="utf=8")
         tmp = list_words.read()
-        read_data = "".join(tmp.split())
+        read_data = "".join(tmp.splitlines())
+
         if read_data == "":
-            self.number_word = 0
-            if self.label_version == "Polish version":
+            self.clear_all_word_list_variable()
+            if self.label_version == self.POLISH_VERSION:
                 return "Folder jest pusty!"
-            elif self.label_version == "English version":
+            elif self.label_version == self.ENGLISH_VERSION:
                 return "Directory is empty!"
         else:
             return str(self.set_words(read_data))
@@ -99,11 +116,13 @@ class LearningLogic:
                 else:
                     english_words += j
             elif j == ";":
-                words_list.append([polish_words, english_words, 0, 0, 0])
+                words_list.append([polish_words, english_words])
                 flag = False
                 polish_words = ""
                 english_words = ""
             self.all_words_list = words_list.copy()
+
+            self.words_counter = self.all_words_list.__len__()
 
         return self.mixing_words(self.all_words_list.copy())
 
@@ -114,6 +133,7 @@ class LearningLogic:
             return self.mixing_words(self.all_words_list.copy())
 
     def mixing_words(self, words_list):
+
         mix_words_list = []
         size_list = words_list.__len__()
         for i in range(0, words_list.__len__()):
@@ -122,54 +142,86 @@ class LearningLogic:
             words_list.pop(draw_choose)
             size_list -= 1
         self.all_words_mix_list = mix_words_list.copy()
+        mix_words_list.clear()
 
         self.actual_choice_word = self.all_words_mix_list[0]
-        self.all_words_mix_list[0].pop()
 
-        if self.actual_language_version == "Polish version":
+        if self.actual_language_version == self.POLISH_VERSION:
             return self.actual_choice_word[1]
-        elif self.actual_language_version == "English version":
+        elif self.actual_language_version == self.ENGLISH_VERSION:
             return self.actual_choice_word[0]
 
-    def check_button(self, polish_entry, english_entry):
-        if self.all_words_list:
-            if self.actual_language_version == "Polish version":
-                polish_entry = "".join(polish_entry).replace(" ", "")
-            elif self.actual_language_version == "English version":
-                english_entry = "".join(english_entry).replace(" ", "")
+    # Check from which field get text, and compare with actual translate word
+    def check_button(self, words_entry, word_label):
+        if word_label != "End of words" or self.all_words_list is None:
+            if self.all_words_mix_list:
+                actual_trans_word = self.all_words_mix_list[self.number_word]
+                if self.all_words_list:
+                    words_entry = "".join(words_entry).replace(" ", "")
 
-            if self.actual_language_version == "Polish version":
-                if english_entry.islower() == "".join(self.actual_choice_word[1].split()).islower():
-                    print("Dobre słowo po Polsku")
-                    pass
-                else:
-                    print("Złe słowo po Polsku")
-                    pass
-            elif self.actual_language_version == "English version":
-                if polish_entry.islower() == "".join(self.actual_choice_word[0].split()).islower():
-                    print("Dobre słowo po Angielsku")
-                    pass
-                else:
-                    print("Złe słowo po Angielsku")
-                    pass
+                if self.actual_language_version == self.POLISH_VERSION:
+                    if words_entry.lower() == "".join(actual_trans_word[0].split()).lower():
+                        self.words_correctly += 1
+                    else:
+                        self.words_incorrectly += 1
+                elif self.actual_language_version == self.ENGLISH_VERSION:
+                    if words_entry.lower() == "".join(actual_trans_word[1].split()).lower():
+                        self.words_correctly += 1
+                    else:
+                        self.words_incorrectly += 1
+        else:
+            # Nothing to do
+            pass
+
+            # Set next word (actual_choice_word)
 
     def load_next_word(self):
-        self.actual_translate_word = self.all_words_mix_list[self.number_word]
-        if self.actual_language_version == "Polish version":
-            print(self.actual_translate_word[1])
-            return self.actual_translate_word[1]
-        elif self.actual_language_version == "English version":
-            print(self.actual_translate_word[0])
-            return self.actual_translate_word[0]
+        if self.all_words_mix_list:
+            self.number_word += 1
+            if self.number_word >= self.all_words_mix_list.__len__():
+                self.number_word -= 1
+                return self.end_words
+            else:
+                self.actual_choice_word = self.all_words_mix_list[self.number_word]
+                # self.actual_translate_word = self.all_words_mix_list[self.number_word]
+                if self.actual_language_version == self.POLISH_VERSION:
+                    return self.actual_choice_word[1]
+                elif self.actual_language_version == self.ENGLISH_VERSION:
+                    return self.actual_choice_word[0]
 
-    def set_label_text_curr_ans(self):
-        if self.all_words_list:
-            if self.actual_language_version == "Polish version":
-                self.number_word = +1
-                return self.actual_choice_word[0]
-            elif self.actual_language_version == "English version":
-                self.number_word = +1
-                return self.actual_choice_word[1]
+    # View a correct word version
+    def set_label_text_curr_ans(self, word_label):
+        if word_label == "End of words":
+            self.curr_ans = "End of words"
+            return self.currently_answer()
+        else:
+            if self.all_words_list:
+                if self.actual_language_version == self.POLISH_VERSION:
+                    self.curr_ans = self.actual_choice_word[0]
+                    self.actual_choice_word = self.all_words_mix_list[self.number_word]
+                    return self.currently_answer()
+                elif self.actual_language_version == self.ENGLISH_VERSION:
+                    self.curr_ans = self.actual_choice_word[1]
+                    self.actual_choice_word = self.all_words_mix_list[self.number_word]
+                    return self.currently_answer()
+
+    def report_counter_set(self):
+        return "Words counter: " + str(self.words_counter)
+
+    def report_correctly_set(self):
+        return "Words correctly: " + str(self.words_correctly)
+
+    def report_incorrectly_set(self):
+        return "Words incorrectly: " + str(self.words_incorrectly)
+
+    def currently_answer(self):
+        return self.curr_ans
+
+    def clear_all_word_list_variable(self):
+        self.all_words_list = None
+        self.all_words_mix_list = None
+        self.actual_choice_word = None
+        self.set_version_label()
 
     def close_Learning_window(self):
         self.words_window_root.destroy()
