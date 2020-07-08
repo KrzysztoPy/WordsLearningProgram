@@ -1,9 +1,9 @@
+import math
 import os
 from random import randint
 
 
 class LearningLogic:
-    # Constans name
     POLISH_VERSION = "Polish version"
     ENGLISH_VERSION = "English version"
 
@@ -20,10 +20,10 @@ class LearningLogic:
     actual_language_version = label_version_language[1]
     currently_language_flag = False
 
-    whole_words_list = None
+    whole_words_list = []
     whole_words_after_mix = None
 
-    actual_choice_word = None
+    actual_choice_word = []
     number_word = 0
 
     code_end = "Error 404"
@@ -87,31 +87,42 @@ class LearningLogic:
             return str(self.set_load_words(read_data))
 
     def set_load_words(self, file_data):
-        words_list = []
-        flag = False
+        # words_list = []
+        all_polish_words_translations = []
+        all_english_words_translations = []
+        flag_end_words = False
         polish_words = ""
         english_words = ""
         for j in file_data:
-            if j != "|" and flag == False and j != ";":
+            if j != "|" and flag_end_words == False and j != ";":
                 if j == ",":
-                    polish_words += j + " "
+                    all_polish_words_translations.append(polish_words)
+                    polish_words = ""
+                    # polish_words += j + " "
                 else:
                     polish_words += j
             elif j == "|":
-                flag = True
-            elif j != "|" and flag == True and j != ";":
+                all_polish_words_translations.append(polish_words)
+                flag_end_words = True
+            elif j != "|" and flag_end_words == True and j != ";":
                 if j == ",":
-                    english_words += j + " "
+                    all_english_words_translations.append(english_words)
+                    english_words = ""
+                    # english_words += j + " "
                 else:
                     english_words += j
             elif j == ";":
-                words_list.append([polish_words, english_words])
-                flag = False
+                all_english_words_translations.append(english_words)
+                self.whole_words_list.append(
+                    [all_polish_words_translations.copy(), all_english_words_translations.copy()])
+                all_polish_words_translations.clear()
+                all_english_words_translations.clear()
+                flag_end_words = False
                 polish_words = ""
                 english_words = ""
-            self.whole_words_list = words_list.copy()
+            # self.whole_words_list = words_list.copy()
 
-            self.words_counter = self.whole_words_list.__len__()
+        self.words_counter = self.whole_words_list.__len__()
 
         return self.mixing_words_after_load(self.whole_words_list.copy())
 
@@ -136,24 +147,54 @@ class LearningLogic:
         self.actual_choice_word = self.whole_words_after_mix[0]
 
         if self.actual_language_version == self.POLISH_VERSION:
-            return self.actual_choice_word[1]
+            convert_list_to_str = ""
+            for i in self.actual_choice_word[1]:
+                convert_list_to_str += i
+            return convert_list_to_str
         elif self.actual_language_version == self.ENGLISH_VERSION:
-            return self.actual_choice_word[0]
+            convert_list_to_str = ""
+            for i in self.actual_choice_word[0]:
+                convert_list_to_str += i
+            return convert_list_to_str
 
     def check_correctness_word(self, words_entry, word_label):
+        particular_word_correctly = 0
+        insertion_into_list_entry_words = []
+        individual_word = ""
+
         if word_label != "End of words" or self.whole_words_list is None:
             if self.whole_words_after_mix:
                 actual_trans_word = self.whole_words_after_mix[self.number_word]
                 if self.whole_words_list:
                     words_entry = "".join(words_entry).replace(" ", "")
+                for i, word in enumerate(words_entry):
+                    if word != ",":
+                        individual_word += word
+                        if i == words_entry.__len__() - 1:
+                            insertion_into_list_entry_words.append(individual_word)
+                            individual_word = ""
+                    elif word == ",":
+                        insertion_into_list_entry_words.append(individual_word)
+                        individual_word = ""
 
                 if self.actual_language_version == self.POLISH_VERSION:
-                    if words_entry.lower() == "".join(actual_trans_word[0].split()).lower():
+                    for tmp_word_translation in actual_trans_word[0]:
+                        for tmp_entry_words in insertion_into_list_entry_words:
+                            if tmp_entry_words.lower() == "".join(tmp_word_translation.split()).lower():
+                                particular_word_correctly += 1
+                                break
+                    if particular_word_correctly >= math.ceil((len(actual_trans_word) * 0.6)):
                         self.words_correctly += 1
                     else:
                         self.words_incorrectly += 1
+
                 elif self.actual_language_version == self.ENGLISH_VERSION:
-                    if words_entry.lower() == "".join(actual_trans_word[1].split()).lower():
+                    for tmp_word_translation in actual_trans_word[1]:
+                        for tmp_entry_words in insertion_into_list_entry_words:
+                            if tmp_entry_words.lower() == "".join(tmp_word_translation.split()).lower():
+                                particular_word_correctly += 1
+                                break
+                    if particular_word_correctly >= math.ceil((len(actual_trans_word) * 0.6)):
                         self.words_correctly += 1
                     else:
                         self.words_incorrectly += 1
@@ -175,18 +216,30 @@ class LearningLogic:
                     return self.actual_choice_word[0]
 
     def set_correct_answer_for_question(self, word_label):
+        tmp_answer_for_question = ""
         if word_label == "End of words":
             self.answer_for_question = "End of words"
             return self.currently_answer()
         else:
             if self.whole_words_list:
                 if self.actual_language_version == self.POLISH_VERSION:
-                    self.answer_for_question = self.actual_choice_word[0]
+                    for i, convert_to_string in enumerate(self.actual_choice_word[0]):
+                        if i < len(self.actual_choice_word[0]) - 1:
+                            tmp_answer_for_question += convert_to_string + ","
+                        else:
+                            tmp_answer_for_question += convert_to_string
                     self.actual_choice_word = self.whole_words_after_mix[self.number_word]
+                    self.answer_for_question = tmp_answer_for_question
                     return self.currently_answer()
+
                 elif self.actual_language_version == self.ENGLISH_VERSION:
-                    self.answer_for_question = self.actual_choice_word[1]
+                    for i, convert_to_string in enumerate(self.actual_choice_word[1]):
+                        if i < len(self.actual_choice_word[1]) - 1:
+                            tmp_answer_for_question += convert_to_string + ","
+                        else:
+                            tmp_answer_for_question += convert_to_string
                     self.actual_choice_word = self.whole_words_after_mix[self.number_word]
+                    self.answer_for_question = tmp_answer_for_question
                     return self.currently_answer()
 
     def report_counter_set(self):
@@ -202,9 +255,9 @@ class LearningLogic:
         return self.answer_for_question
 
     def clear_all_word_list_variable(self):
-        self.whole_words_list = None
+        self.whole_words_list.clear()
         self.whole_words_after_mix = None
-        self.actual_choice_word = None
+        self.actual_choice_word.clear()
         self.clear_to_first_position()
 
     def close_Learning_window(self):
