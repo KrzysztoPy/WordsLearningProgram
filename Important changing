@@ -1,9 +1,22 @@
 Zmienić odbieranie słówek do listy ponieważ jeśli zostanie podane ponad 66% tłumaczeń porawnie to powinno uznać słowo za
 dobrze napisane. -> V  ->
 
+Dodać wyświetlaną informacje o poprawnym lub nie wpisaniu słowa do programu -> X
+
+
+
 Naprawić przycisk back i wyjście za pomocą  -> X
 
 Stworzyć wpisywanie słówek za pomocą programu -> X
 
-dodatkowo:
+Po kliknięciu Remove powinien być komunikat o poprawnym wykonaniu usunięcia -> X
+
+Niepowinno być żadnego wybranego pliku na początku -> X
+
+
+dodatkowo:0
     zapisywanie i odczytywanie z pliku słów binarnie -> X
+
+Pojedyńcze słowa po wpisanie dobrze są uznawane za złe ->V
+
+Utworzenie ramek (Frame na poszczególne moduły) - X

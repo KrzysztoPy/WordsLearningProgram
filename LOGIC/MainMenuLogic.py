@@ -3,7 +3,7 @@ import os
 
 
 class MenuLogic():
-    dir_name = "Words list"
+    dir_name = "../Words list"
 
     def create_words_list_dir(self):
         file_path = os.path.realpath(__file__)

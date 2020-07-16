@@ -119,6 +119,7 @@ class GuiLearning(LearningLogic):
         self.file_words_list.set(file_lists[0])
 
         choice_file = OptionMenu(self.learning_logic_root, self.file_words_list, *file_lists)
+        choice_file.config(width=20)
         choice_file.grid(row=1, column=0, ipadx=65)
 
     def set_entry_field(self):

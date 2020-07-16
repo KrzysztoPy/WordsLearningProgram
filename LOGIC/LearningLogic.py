@@ -14,7 +14,7 @@ class LearningLogic:
     answer_for_question = None
 
     show_whole_file_in_file = None
-    dir_name_with_words_lists = "Words list"
+    dir_name_with_words_lists = "../Words list"
 
     label_version_language = ["English version", "Polish version"]
     actual_language_version = label_version_language[1]
@@ -183,7 +183,7 @@ class LearningLogic:
                             if tmp_entry_words.lower() == "".join(tmp_word_translation.split()).lower():
                                 particular_word_correctly += 1
                                 break
-                    if particular_word_correctly >= math.ceil((len(actual_trans_word) * 0.6)):
+                    if particular_word_correctly >= math.ceil((len(actual_trans_word[0]) * 0.6)):
                         self.words_correctly += 1
                     else:
                         self.words_incorrectly += 1
@@ -194,7 +194,8 @@ class LearningLogic:
                             if tmp_entry_words.lower() == "".join(tmp_word_translation.split()).lower():
                                 particular_word_correctly += 1
                                 break
-                    if particular_word_correctly >= math.ceil((len(actual_trans_word) * 0.6)):
+                    print(math.ceil((len(actual_trans_word[1]) * 0.6)))
+                    if particular_word_correctly >= math.ceil((len(actual_trans_word[1]) * 0.6)):
                         self.words_correctly += 1
                     else:
                         self.words_incorrectly += 1

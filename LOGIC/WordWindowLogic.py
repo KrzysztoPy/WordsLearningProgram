@@ -1,14 +1,14 @@
 from tkinter import *
-import pathlib
 from pathlib import Path
 import os
 
 
-class Logic:
-    # Create dir where save your list words
-    dir_name = "Words list"
-    # Stores a list of files
-    list_all_file = []
+class WordWindowLogic:
+    dir_with_words_list = "../Words list"
+
+    list_all_words_list = []
+
+    actual_select_file = "None"
 
     # Create directory when you save new words list
     def create_directory(self):
@@ -19,7 +19,7 @@ class Logic:
                 break
             else:
                 file_path = file_path[:-1]
-        file_path += self.dir_name
+        file_path += self.dir_with_words_list
         Path(file_path).mkdir(exist_ok=True)
         return ["Information", "Directory was created"]  # Do usunięcia
 
@@ -50,7 +50,7 @@ class Logic:
             else:
                 tmp_path = tmp_path[:-1]
 
-        tmp_path += self.dir_name
+        tmp_path += self.dir_with_words_list
         return tmp_path
 
     def create_file(self, file_name):
@@ -74,11 +74,11 @@ class Logic:
             return file_name + ".txt"
 
     def file_list(self):
-        self.list_all_file = os.listdir(self.words_list_path())
+        self.list_all_words_list = os.listdir(self.words_list_path())
 
-        if self.list_all_file.__len__() == 0:
-            self.list_all_file.append("Empty")
-        return self.list_all_file
+        if self.list_all_words_list.__len__() == 0:
+            self.list_all_words_list.append("Empty")
+        return self.list_all_words_list
 
     def file_create(self, file_name):
         if file_name == "":
@@ -94,9 +94,17 @@ class Logic:
     def load_butt(self, file_name):
         tmp_path = self.words_list_path() + "\\" + file_name
         list_words = open(tmp_path, "r", encoding="utf=8")
-        tmp = list_words.read()
-        file_data = "".join(tmp.split())
+        data_from_file = list_words.read()
+        file_data = "".join(data_from_file.split())
         return self.set_words_from_file(file_data)
+
+    def actual_select_file_string_set(self, file_name):
+        return "Actual select file: " + file_name
+
+    def remove_button(self, file_name):
+        tmp_path = self.words_list_path() + "\\" + file_name
+        os.remove(tmp_path)
+
 
     def set_words_from_file(self, file_data):
 
@@ -104,7 +112,6 @@ class Logic:
         flag = FALSE
         polish_words = ""
         english_words = ""
-        # dom,ojczyzna|home
         counter = 1
         for j in file_data:
             if j != "|" and flag == FALSE and j != ";":
@@ -114,7 +121,7 @@ class Logic:
                     polish_words += j
             elif j == "|":
                 flag = TRUE
-            elif j != "|" and flag == True and j != ";":
+            elif j != "|" and flag is True and j != ";":
                 if j == ",":
                     english_words += j + " "
                 else:
@@ -168,9 +175,9 @@ class Logic:
 
 
 def test():
-    logic = Logic()
+    # logic = Logic()
     # # rano|a.m.;około|about;
-    logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
+    # logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
     # logic.load_butt("bla.txt")
     # path = os.path.realpath(__file__)
     # print(os.path.basename(__file__))
