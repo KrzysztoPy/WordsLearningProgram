@@ -105,7 +105,6 @@ class WordWindowLogic:
         tmp_path = self.words_list_path() + "\\" + file_name
         os.remove(tmp_path)
 
-
     def set_words_from_file(self, file_data):
 
         words_list = []
@@ -172,6 +171,10 @@ class WordWindowLogic:
 
     def find_word(self):
         pass
+
+    def close_words_window(self, top_window, main_window):
+        top_window.destroy()
+        main_window.deiconify()
 
 
 def test():

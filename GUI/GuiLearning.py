@@ -22,10 +22,15 @@ class GuiLearning(LearningLogic):
     tmp_all_words_counter = None
     tmp_correctly_words_counter = None
     tmp_incorrectly_words_counter = None
+    tmp_user_wrote_answer = None
+    tmp_label_good_bad_answer = "None"
+    tmp_color_and_good_bad_answer = None
 
     label_all_words_counter = None
     label_correctly_words_counter = None
     label_incorrectly_words_counter = None
+    label_user_wrote_answer = None
+    label_good_bad_answer = None
 
     def start_learning_menu(self, root):
         self.gui_learning_main_root = root
@@ -37,6 +42,9 @@ class GuiLearning(LearningLogic):
         self.tmp_all_words_counter = StringVar()
         self.tmp_correctly_words_counter = StringVar()
         self.tmp_incorrectly_words_counter = StringVar()
+
+        self.tmp_user_wrote_answer = StringVar()
+        self.tmp_label_good_bad_answer = StringVar()
 
         self.learning_logic_root = Toplevel(self.gui_learning_main_root)
         self.learning_logic_root.geometry(self.l_logic.set_size_main_pop(self.gui_learning_main_root))
@@ -91,6 +99,10 @@ class GuiLearning(LearningLogic):
         constans_label_correctly_answer = Label(self.learning_logic_root, fg="green", font='Helvetica 11 bold',
                                                 text="Correct answer: ")
         constans_label_correctly_answer.grid(row=4, column=2)
+
+        constans_label_user_answer = Label(self.learning_logic_root, fg="black", font='Helvetica 11 bold',
+                                           text="Your answer: ")
+        constans_label_user_answer.grid(row=4, column=4)
 
         constans_label_polish_word_version = Label(self.learning_logic_root, font='Helvetica 11 bold',
                                                    text="Polish version ---> ")
@@ -162,40 +174,38 @@ class GuiLearning(LearningLogic):
         version_butt.grid(row=1, column=4, ipadx=70, pady=0)
 
         butt_word_check = Button(self.learning_logic_root, font='Helvetica 11 bold', text="Words Check",
-                                 command=lambda:
-                                 [self.l_logic.check_correctness_word(self.entry_label_word_translation.get(),
-                                                                      self.tmp_word_for_translate.get()),
-                                  # Set widget and go to next words
-                                  self.tmp_text_correct_answer.set(
-                                      self.l_logic.set_correct_answer_for_question(self.tmp_word_for_translate.get())),
-                                  # Set widget
-                                  self.tmp_word_for_translate.set(self.l_logic.load_next_word()),
-                                  self.tmp_correctly_words_counter.set(self.l_logic.report_correctly_set()),
-                                  self.tmp_incorrectly_words_counter.set(self.l_logic.report_incorrectly_set()),
-                                  self.change_label_correctly_word_version(),
-                                  self.change_label_word_for_translation(),
-                                  self.change_label_report_correctly_words(),
-                                  self.change_label_report_incorrectly_words()
+                                 command=lambda: self.butt_word_check_command(event=NONE))
 
-                                  ])
         butt_word_check.grid(row=5, column=2, ipadx=70, pady=0)
         butt_back = Button(self.learning_logic_root, font='Helvetica 11 bold',
-                           text="BACK", command=self.l_logic.close_Learning_window)
+                           text="BACK", command=lambda: self.l_logic.close_Learning_window(self.learning_logic_root,
+                                                                                           self.gui_learning_main_root,
+                                                                                           self.l_logic))
 
         butt_back.grid(row=9, column=0, ipadx=70, pady=0)
 
     # Copy butt_word_check from set_all_button for enter click event
     def butt_word_check_command(self, event):
-        self.l_logic.check_correctness_word(self.entry_label_word_translation.get(), self.tmp_word_for_translate.get())
+        self.l_logic.check_correctness_word(self.entry_label_word_translation.get(),
+                                            self.tmp_word_for_translate.get()),
+        self.tmp_label_good_bad_answer.set(self.l_logic.set_label_whether_good_bad_answer()),
+        self.tmp_color_and_good_bad_answer = self.l_logic.set_label_good_bad_answer_color(),
+
+        self.tmp_user_wrote_answer.set(
+            self.l_logic.set_label_user_answer(self.entry_label_word_translation.get())),
+        self.entry_label_word_translation.delete(0, 'end'),
         self.tmp_text_correct_answer.set(
-            self.l_logic.set_correct_answer_for_question(self.tmp_word_for_translate.get()))
-        self.tmp_word_for_translate.set(self.l_logic.load_next_word())
+            self.l_logic.set_correct_answer_for_question(self.tmp_word_for_translate.get())),
+        # Set widget
+        self.tmp_word_for_translate.set(self.l_logic.load_next_word()),
         self.tmp_correctly_words_counter.set(self.l_logic.report_correctly_set()),
         self.tmp_incorrectly_words_counter.set(self.l_logic.report_incorrectly_set()),
+        self.change_label_user_answer(),
+        self.change_label_good_bad_view_answer(),
         self.change_label_correctly_word_version(),
         self.change_label_word_for_translation(),
         self.change_label_report_correctly_words(),
-        self.change_label_report_incorrectly_words()
+        self.change_label_report_incorrectly_words(),
 
     def change_label_language_version(self):
         self.label_text_language_version = Label(self.learning_logic_root, font='Helvetica 11 bold',
@@ -226,3 +236,14 @@ class GuiLearning(LearningLogic):
         self.label_incorrectly_words_counter = Label(self.learning_logic_root, fg="red", font='Helvetica 11 bold',
                                                      textvariable=self.tmp_incorrectly_words_counter)
         self.label_incorrectly_words_counter.grid(row=7, column=3)
+
+    def change_label_user_answer(self):
+        self.label_user_wrote_answer = Label(self.learning_logic_root, fg="black", font='Helvetica 11 bold',
+                                             textvariable=self.tmp_user_wrote_answer)
+        self.label_user_wrote_answer.grid(row=4, column=5)
+
+    def change_label_good_bad_view_answer(self):
+        self.label_good_bad_answer = Label(self.learning_logic_root, fg=self.tmp_color_and_good_bad_answer,
+                                           font='Helvetica 11 bold',
+                                           textvariable=self.tmp_label_good_bad_answer)
+        self.label_good_bad_answer.grid(row=5, column=3)

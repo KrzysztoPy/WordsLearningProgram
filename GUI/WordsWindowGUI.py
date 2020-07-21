@@ -134,7 +134,9 @@ class WordsWindow(WordWindowLogic):
         butt_find = Button(self.words_window_root, text="Find", command=self.word_window_logic.find_word)
         butt_find.grid(row=2, column=6, ipadx=10, pady=25)
 
-        butt_back = Button(self.words_window_root, text="Back", command=self.close_words_window)
+        butt_back = Button(self.words_window_root, text="Back",
+                           command=lambda: self.word_window_logic.close_words_window(self.words_window_root,
+                                                                                     self.main_menu_root))
         butt_back.grid(row=4, column=0, ipadx=25, pady=25)
 
     # set all field
@@ -235,10 +237,10 @@ class WordsWindow(WordWindowLogic):
             self.set_value_table(info_list[2])
             messagebox.showinfo(info_list[0], info_list[1])
 
-    def close_words_window(self):
-        self.words_window_root.destroy()
-        self.main_menu_root.destroy()
-        exit()
+    # def close_words_window(self):
+    #     self.words_window_root.destroy()
+    #     self.main_menu_root.destroy()
+    #     exit()
 
     def test(self):
         my_list = ["One", "Two", "Three"]
