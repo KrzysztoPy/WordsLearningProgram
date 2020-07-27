@@ -15,4 +15,5 @@ class MenuLogic():
         file_path += self.dir_name
         Path(file_path).mkdir(exist_ok=True)
 
-    pass
+    # def destroy_learning_window_variable(self, learning_window):
+    #     learning_window.__del__(self)

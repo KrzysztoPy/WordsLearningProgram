@@ -42,6 +42,12 @@ class MainWindow(WordsWindow, GuiLearning, MenuLogic):
 
         self.start_learning.grid(row=0, column=2, ipadx=40, pady=25)
 
+    # def set_learning_window(self, learning_window):
+    #     self.learning_window = learning_window
+    #
+    # def get_learning_window(self):
+    #     return self.learning_window
+
 
 def main():
     gui = MainWindow()

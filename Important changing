@@ -17,6 +17,11 @@ Niepowinno być żadnego wybranego pliku na początku -> X
 dodatkowo:0
     zapisywanie i odczytywanie z pliku słów binarnie -> X
 
-Pojedyńcze słowa po wpisanie dobrze są uznawane za złe ->V
+Pojedyńcze słowa po wpisanie dobrze są uznawane za złe -> V
 
 Utworzenie ramek (Frame na poszczególne moduły) - X
+
+Word_Window_Logic - > Dodawanie do listy nowwgo obiektu
+    1) Informacja o dodaniu lub nie nowego słowa
+    2) Informacja o stanie zapisu lub nie listy z nowymi
+    3) set_value_table zamienić na wykonywanie value w pliku logic nie w gui !!!

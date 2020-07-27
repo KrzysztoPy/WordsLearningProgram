@@ -238,7 +238,8 @@ class GuiLearning(LearningLogic):
         self.label_incorrectly_words_counter.grid(row=7, column=3)
 
     def change_label_user_answer(self):
-        self.label_user_wrote_answer = Label(self.learning_logic_root, fg="black", font='Helvetica 11 bold',
+        self.label_user_wrote_answer = Label(self.learning_logic_root, fg=self.tmp_color_and_good_bad_answer,
+                                             font='Helvetica 11 bold',
                                              textvariable=self.tmp_user_wrote_answer)
         self.label_user_wrote_answer.grid(row=4, column=5)
 

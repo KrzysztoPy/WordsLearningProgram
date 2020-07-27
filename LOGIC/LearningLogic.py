@@ -35,6 +35,9 @@ class LearningLogic:
     code_end = "Error 404"
     end_words = "End of words"
 
+    def __del__(self):
+        pass
+
     def set_size_main_pop(self, main_root):
         window_width = 1300
         window_height = 310
@@ -55,10 +58,10 @@ class LearningLogic:
         return path_to_file
 
     def show_whole_file_in_file(self):
-        self.show_whole_dir_in_file = os.listdir(self.indication_file_with_words())
-        if self.show_whole_dir_in_file.__len__() == 0:
-            self.show_whole_dir_in_file.append("Empty")
-        return self.show_whole_dir_in_file
+        show_whole_file_in_file = os.listdir(self.indication_file_with_words())
+        if show_whole_file_in_file.__len__() == 0:
+            show_whole_file_in_file.append("Empty")
+        return show_whole_file_in_file
 
     def set_version_label(self):
         # Sets again pointer to first word
@@ -284,6 +287,5 @@ class LearningLogic:
     def close_Learning_window(self, top_window, main_window, l_logic):
         top_window.destroy()
         main_window.deiconify()
-        l_logic = None
         # self.words_window_root.destroy()
         # self.main_root.destroy()
