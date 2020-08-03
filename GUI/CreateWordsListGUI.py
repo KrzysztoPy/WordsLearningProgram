@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from LOGIC.WordWindowLogic import *
+from LOGIC.CreateWordsListLogic import *
 from tkinter import ttk
 
 
@@ -116,16 +116,15 @@ class WordsWindow(WordWindowLogic):
                                                       "None"))])
         butt_remove.grid(row=1, column=5, ipadx=70, pady=0)
 
-        butt_save = Button(self.words_window_root, text="Save words")  # Without command!!!
+        butt_save = Button(self.words_window_root, text="Save words")
         butt_save.grid(row=4, column=4, ipadx=70, pady=0)
 
         butt_add = Button(self.words_window_root, text="Add",
-                          command=lambda: [self.info_popup(
-                              self.word_window_logic.check_fields_is_not_empty(self.widget_entry_polish_word.get(),
-                                                                               self.widget_entry_english_word.get())),
+                          command=lambda: [
                               self.info_popup(
-                                  self.word_window_logic.whether_repeat_words(self.widget_entry_polish_word.get(),
-                                                                              self.widget_entry_english_word.get()))
+                                  self.word_window_logic.whether_repeat_empty_field_and_no_selected_list(
+                                      self.widget_entry_polish_word.get(),
+                                      self.widget_entry_english_word.get())), self.set_value_table()
                           ])
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
 
@@ -190,7 +189,7 @@ class WordsWindow(WordWindowLogic):
         self.table_with_headers = ttk.Treeview(self.words_window_root, selectmode='browse')
         self.table_with_headers.grid(row=3, column=2, columnspan=2)
         verscrlbar = ttk.Scrollbar(self.words_window_root, orient="vertical", command=self.table_with_headers.yview)
-        verscrlbar.grid(row=3, column=2, sticky=N + S + E, columnspan=2)
+        verscrlbar.grid(row=3, column=3, sticky=N + S + E)
         self.table_with_headers.configure(xscrollcommand=verscrlbar.set)
 
         self.table_with_headers["columns"] = ("1", "2", "3")
@@ -204,21 +203,19 @@ class WordsWindow(WordWindowLogic):
         self.table_with_headers.heading("2", text="Polish word")
         self.table_with_headers.heading("3", text="English word")
 
+    def add_new_word_from_table(self):
+        # self.table_with_headers.insert("", 'end',
+        #                                values=self.word_window_logic.return_words_line(counter))
+        pass
+
     def set_value_table(self):
         # [[x,y,x],[x,y,z]]
 
+        self.table_with_headers.delete(*self.table_with_headers.get_children())
         for counter in range(0, self.word_window_logic.get_all_words_in_select_list().__len__(), 3):
-            print(self.word_window_logic.return_words_line(counter))
             self.table_with_headers.insert("", 'end',
                                            values=self.word_window_logic.return_words_line(counter))
-            # words_from_actual_selected_list[i], str(words_from_actual_selected_list[i + 1]),
-            # str(words_from_actual_selected_list[i + 2])))
-            # print("1" + str(words_from_actual_selected_list[i]))
-            # print("2" + str(words_from_actual_selected_list[i + 1]))
-            # print("3" + str(words_from_actual_selected_list[i + 2]))
-            # actual_entered_words.append(words_from_actual_selected_list[i])
-            # actual_entered_words.append(words_from_actual_selected_list[i + 1])
-            # actual_entered_words.append(words_from_actual_selected_list[i + 2])
+        print(self.table_with_headers.get_children())
 
     def option_menu_widget(self):
         self.actual_list_word_lists = self.word_window_logic.file_list()

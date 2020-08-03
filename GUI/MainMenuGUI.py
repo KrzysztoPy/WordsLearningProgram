@@ -1,7 +1,7 @@
 from tkinter import *
 
 from LOGIC.MainMenuLogic import MenuLogic
-from GUI.WordsWindowGUI import *
+from GUI.CreateWordsListGUI import *
 from GUI.GuiLearning import *
 
 

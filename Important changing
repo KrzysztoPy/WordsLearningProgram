@@ -22,6 +22,7 @@ Pojedyńcze słowa po wpisanie dobrze są uznawane za złe -> V
 Utworzenie ramek (Frame na poszczególne moduły) - X
 
 Word_Window_Logic - > Dodawanie do listy nowwgo obiektu
-    1) Informacja o dodaniu lub nie nowego słowa
-    2) Informacja o stanie zapisu lub nie listy z nowymi
+    1) Informacja o dodaniu lub nie nowego słowa -> 50%
+    2) Informacja o stanie zapisu lub nie listy z nowymi - X
     3) set_value_table zamienić na wykonywanie value w pliku logic nie w gui !!!
+    4) whether_repeat_empty_field_and_no_selected_list - > Zamienić dane wejściowe na listy i sprawdzać je zapomocą for w następnej lini

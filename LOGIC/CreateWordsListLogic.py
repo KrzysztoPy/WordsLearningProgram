@@ -4,15 +4,19 @@ import os
 
 
 class WordWindowLogic:
+    ERROR = 'Error'
+    INFORMATION = 'Information'
+    SAVE = 'Save'
     dir_with_words_list = "../Words list"
 
     list_all_words_list = []
 
-    actual_select_file = "None"
+    name_actual_select_file = "None"
 
     all_words_in_select_list = []
 
-    list_with_old_and_new_words = []
+    list_with_new_adding_words = []
+    actual_adding_word = []
 
     # Create directory when you save new words list
     def create_directory(self):
@@ -100,6 +104,7 @@ class WordWindowLogic:
         return self.set_list_with_words_from_file(file_data)
 
     def actual_select_file_string_set(self, file_name):
+        self.set_name_actual_select_file(file_name)
         return "Actual select file: " + file_name
 
     def remove_button(self, file_name):
@@ -132,7 +137,6 @@ class WordWindowLogic:
                 if j == ",":
                     english_all_translations.append(english_words)
                     english_words = ""
-                    # english_words += j + " "
                 else:
                     english_words += j
             elif j == ";":
@@ -161,6 +165,11 @@ class WordWindowLogic:
         # for counter in range(0, self.actual_entered_words.len() + 1, 3):
         pass
 
+    # def set_all_words_in_select_list(self, counter, polish_word, english_word):
+    #     self.all_words_in_select_list.insert([counter, [polish_word, english_word]])
+    #
+    #     pass
+
     def set_all_words_in_select_list(self, all_words_from_selected_list):
         self.all_words_in_select_list = all_words_from_selected_list.copy()
 
@@ -179,25 +188,57 @@ class WordWindowLogic:
     def check_english_entry(self, english_word):
         pass
 
+    def set_name_actual_select_file(self, name_actual_select_file):
+        self.name_actual_select_file = name_actual_select_file
+
+    def get_name_actual_select_file(self):
+        return self.name_actual_select_file
+
     def check_fields_is_not_empty(self, polish_word, english_word):
-        if polish_word == "":
+        if self.get_name_actual_select_file() == "None":
+            return ["Error", "You must choice any file!"]
+        elif polish_word == "":
             return ["Error", "Musisz wpisać polską wersje słowa."]
         elif english_word == "":
             return ["Error", "You must writing english word version."]
-        # return self.check_change(polish_word, english_word)
+        else:
+            return ["All right"]
 
-    def whether_repeat_words(self, polish_words, english_words):
+    def whether_repeat_empty_field_and_no_selected_list(self, polish_words, english_words):
         polish_repeat = False
         english_repeat = False
 
-        for counter in range(0, self.all_words_in_select_list, 3):
-            if polish_words.strip() == self.all_words_in_select_list[counter + 1]:
-                polish_repeat = True
-            if english_words.strip() == self.all_words_in_select_list[counter + 1]:
-                pass  # !!!!!!!!!!!!!!!!!!! NOT ENDING !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        check_is_empty_or_no_selected_list = self.check_fields_is_not_empty(polish_words, english_words)
+        if check_is_empty_or_no_selected_list[0] != "Error":
+            for counter in range(0, self.all_words_in_select_list.__len__(), 3):
+
+                for words in self.all_words_in_select_list[counter + 1]:
+                    if (polish_words.strip()).lower() == (words.strip()).lower():
+                        polish_repeat = True
+                        break
+                for words in self.all_words_in_select_list[counter + 2]:
+                    if (english_words.strip()).lower() == (words.strip()).lower():
+                        english_repeat = True
+                        break
+
+                if polish_repeat == True and english_repeat == True:
+                    return ["Error", "The same word exist in list. In table number : {}".format(int(counter / 3 + 1))]
+                else:
+                    return self.adding_word_for_list(
+                        int(self.all_words_in_select_list.__len__() / 3) +1, [polish_words], [english_words])
+        else:
+            return check_is_empty_or_no_selected_list
+
+    def adding_word_for_list(self, counter, polish_word, english_word):
+
+        tmp_all_words = self.get_all_words_in_select_list()
+        tmp_all_words.append(counter)
+        tmp_all_words.append(polish_word)
+        tmp_all_words.append(english_word)
+        self.set_all_words_in_select_list(tmp_all_words.copy())
+        return [self.INFORMATION, "Adding new word to list"]
 
     def check_change(self, polish_word, english_word):
-
         return self.save_to_table(polish_word, english_word)
 
     def save_to_table(self, polish_word, english_word):
@@ -228,28 +269,27 @@ class WordWindowLogic:
         top_window.destroy()
         main_window.deiconify()
 
-
-def test():
-    # logic = Logic()
-    # # rano|a.m.;około|about;
-    # logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
-    # logic.load_butt("bla.txt")
-    # path = os.path.realpath(__file__)
-    # print(os.path.basename(__file__))
-    # print("\\")
+    # def test():
+    #     # logic = Logic()
+    #     # # rano|a.m.;około|about;
+    #     # logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
+    #     # logic.load_butt("bla.txt")
+    #     # path = os.path.realpath(__file__)
+    #     # print(os.path.basename(__file__))
+    #     # print("\\")
+    #     #
+    #     # print(path)
+    #     # print(type(path))
+    #     # print(type(pathlib.Path(__file__).parent.absolute()))
+    #     # bla = "xyz"
+    #     # print("\\{}".format(bla))
+    #     pass
+    #     # print(type(path))
+    #     # print(path)
+    #     # path.mkdir()
+    #     # print(path)
+    #     # print(path.realpath(__file__))
+    #     # print(pathlib.Path(__file__))
     #
-    # print(path)
-    # print(type(path))
-    # print(type(pathlib.Path(__file__).parent.absolute()))
-    # bla = "xyz"
-    # print("\\{}".format(bla))
-    pass
-    # print(type(path))
-    # print(path)
-    # path.mkdir()
-    # print(path)
-    # print(path.realpath(__file__))
-    # print(pathlib.Path(__file__))
-
-
-test()
+    #
+    # test()
