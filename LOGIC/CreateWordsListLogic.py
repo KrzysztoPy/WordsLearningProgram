@@ -8,15 +8,14 @@ class WordWindowLogic:
     INFORMATION = 'Information'
     SAVE = 'Save'
     dir_with_words_list = "../Words list"
-
-    list_all_words_list = []
-
     name_actual_select_file = "None"
 
+    list_all_words_list = []
     all_words_in_select_list = []
-
-    list_with_new_adding_words = []
+    # list_with_new_adding_words = []
     actual_adding_word = []
+
+    convert_value_from_click_table_event = []
 
     # Create directory when you save new words list
     def create_directory(self):
@@ -154,21 +153,10 @@ class WordWindowLogic:
         return self.get_all_words_in_select_list()
 
     def return_words_line(self, counter):
-        all_words_on_selected_list = self.get_all_words_in_select_list()
+        tmp_all_words_on_selected_list = self.get_all_words_in_select_list()
 
-        return (all_words_on_selected_list[counter], ",".join(all_words_on_selected_list[counter + 1]),
-                ",".join(all_words_on_selected_list[counter + 2]))
-
-    def check_is_repeating(self, entry_polish_word, entry_english_word):
-        isolated_polish_words = []
-        isolated_english_words = []
-        # for counter in range(0, self.actual_entered_words.len() + 1, 3):
-        pass
-
-    # def set_all_words_in_select_list(self, counter, polish_word, english_word):
-    #     self.all_words_in_select_list.insert([counter, [polish_word, english_word]])
-    #
-    #     pass
+        return (tmp_all_words_on_selected_list[counter], ",".join(tmp_all_words_on_selected_list[counter + 1]),
+                ",".join(tmp_all_words_on_selected_list[counter + 2]))
 
     def set_all_words_in_select_list(self, all_words_from_selected_list):
         self.all_words_in_select_list = all_words_from_selected_list.copy()
@@ -223,9 +211,9 @@ class WordWindowLogic:
 
                 if polish_repeat == True and english_repeat == True:
                     return ["Error", "The same word exist in list. In table number : {}".format(int(counter / 3 + 1))]
-                else:
+                elif counter == self.all_words_in_select_list.__len__() - 3:
                     return self.adding_word_for_list(
-                        int(self.all_words_in_select_list.__len__() / 3) +1, [polish_words], [english_words])
+                        int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
         else:
             return check_is_empty_or_no_selected_list
 
@@ -240,6 +228,56 @@ class WordWindowLogic:
 
     def check_change(self, polish_word, english_word):
         return self.save_to_table(polish_word, english_word)
+
+    def convert_value_from_table_to_remove(self, removing_words={}):
+        convert_value_from_table = []
+        for num, value in enumerate(removing_words.get("values")):
+            if num != 0:
+                tmp_value = value.__str__()
+                tmp_new_list_particular_word = ""
+                new_list_with_convert_words = []
+                for counter, sign in enumerate(tmp_value):
+                    if sign != ',':
+                        tmp_new_list_particular_word += sign
+                        if counter == (tmp_value.__len__() - 1):
+                            new_list_with_convert_words.append(tmp_new_list_particular_word)
+                            tmp_new_list_particular_word = ""
+                    elif sign == ",":
+                        new_list_with_convert_words.append(tmp_new_list_particular_word)
+                        tmp_new_list_particular_word = ""
+
+                convert_value_from_table.append(new_list_with_convert_words.copy())
+            else:
+                convert_value_from_table.append(value)
+        self.convert_value_from_click_table_event = convert_value_from_table
+
+    def remove_word_from_lists(self):
+        if not self.convert_value_from_click_table_event:
+            return [self.ERROR, "You didn't choose element which you want remove. Please try again."]
+
+        copy_all_words_in_select_list = (self.get_all_words_in_select_list()).copy()
+        for i in self.all_words_in_select_list:
+            for j in self.convert_value_from_click_table_event:
+
+                if i == j:
+                    copy_all_words_in_select_list.remove(j)
+                    break
+
+        self.set_all_words_in_select_list(copy_all_words_in_select_list.copy())
+        return self.changing_id_number()
+
+    def changing_id_number(self):
+
+        tmp_all_words_in_select_list = self.get_all_words_in_select_list().copy()
+        for counter in range(0, tmp_all_words_in_select_list.__len__(), 3):
+            if counter == 0:
+                tmp_all_words_in_select_list[counter] = counter + 1
+            else:
+                tmp_all_words_in_select_list[counter] = int((counter / 3) + 1)
+
+        self.set_all_words_in_select_list(tmp_all_words_in_select_list.copy())
+        self.convert_value_from_click_table_event.clear()
+        return [self.INFORMATION, "Remove word from table!!!"]
 
     def save_to_table(self, polish_word, english_word):
         # tmp_words = []

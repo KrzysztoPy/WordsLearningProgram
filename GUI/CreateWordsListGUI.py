@@ -31,6 +31,8 @@ class WordsWindow(WordWindowLogic):
     label_currently_open_folder = None
     label_currently_open_file = None
 
+    selected = []
+
     def set_param_main_pop(self, main_menu_root) -> str:
         window_width = 1300
         window_height = 600
@@ -128,7 +130,9 @@ class WordsWindow(WordWindowLogic):
                           ])
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
 
-        butt_remove = Button(self.words_window_root, text="Remove", command=self.word_window_logic.remove_word)
+        butt_remove = Button(self.words_window_root, text="Remove word",
+                             command=lambda: [self.info_popup(self.word_window_logic.remove_word_from_lists()),
+                                              self.set_value_table()])
         butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
 
         butt_find = Button(self.words_window_root, text="Find", command=self.word_window_logic.find_word)
@@ -202,6 +206,7 @@ class WordsWindow(WordWindowLogic):
         self.table_with_headers.heading("1", text="Id")
         self.table_with_headers.heading("2", text="Polish word")
         self.table_with_headers.heading("3", text="English word")
+        self.table_with_headers.bind('<Double-1>', self.on_select)
 
     def add_new_word_from_table(self):
         # self.table_with_headers.insert("", 'end',
@@ -239,6 +244,10 @@ class WordsWindow(WordWindowLogic):
             self.set_table()
             self.set_value_table()
             messagebox.showinfo(info_list[0], info_list[1])
+
+    def on_select(self, event):
+        cur_item = self.table_with_headers.focus()
+        self.word_window_logic.convert_value_from_table_to_remove(self.table_with_headers.item(cur_item))
 
     # def close_words_window(self):
     #     self.words_window_root.destroy()
