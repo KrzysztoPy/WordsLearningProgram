@@ -2,7 +2,7 @@ from LOGIC.LearningLogic import *
 from tkinter import *
 
 
-class GuiLearning(LearningLogic):
+class LearningGUI(LearningLogic):
     l_logic = LearningLogic()
 
     gui_learning_main_root = None

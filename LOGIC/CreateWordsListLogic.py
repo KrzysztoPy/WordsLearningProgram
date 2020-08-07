@@ -3,11 +3,11 @@ from pathlib import Path
 import os
 
 
-class WordWindowLogic:
+class CreateWordsListLogic:
     ERROR = 'Error'
     INFORMATION = 'Information'
     SAVE = 'Save'
-    dir_with_words_list = "../Words list"
+    dir_with_words_list = "Words list"
     name_actual_select_file = "None"
 
     list_all_words_list = []
@@ -16,19 +16,6 @@ class WordWindowLogic:
     actual_adding_word = []
 
     convert_value_from_click_table_event = []
-
-    # Create directory when you save new words list
-    def create_directory(self):
-
-        file_path = os.path.realpath(__file__)
-        for i in file_path[::-1]:
-            if i == "\\":
-                break
-            else:
-                file_path = file_path[:-1]
-        file_path += self.dir_with_words_list
-        Path(file_path).mkdir(exist_ok=True)
-        return ["Information", "Directory was created"]  # Do usunięcia
 
     def save_new_words_list(self, words=[]):
         return words.__len__() < 1
@@ -46,7 +33,7 @@ class WordWindowLogic:
             create.close()
 
     def words_list_path(self):
-        tmp_path = os.path.realpath(__file__)
+        tmp_path = (Path(__file__).parent.absolute()).__str__()
 
         for i in tmp_path[::-1]:
             if i == "\\":
@@ -184,38 +171,42 @@ class WordWindowLogic:
 
     def check_fields_is_not_empty(self, polish_word, english_word):
         if self.get_name_actual_select_file() == "None":
-            return ["Error", "You must choice any file!"]
+            return [self.ERROR, "You must choice any file!"]
         elif polish_word == "":
-            return ["Error", "Musisz wpisać polską wersje słowa."]
+            return [self.ERROR, "Musisz wpisać polską wersje słowa."]
         elif english_word == "":
-            return ["Error", "You must writing english word version."]
+            return [self.ERROR, "You must writing english word version."]
         else:
             return ["All right"]
 
     def whether_repeat_empty_field_and_no_selected_list(self, polish_words, english_words):
         polish_repeat = False
         english_repeat = False
-
-        check_is_empty_or_no_selected_list = self.check_fields_is_not_empty(polish_words, english_words)
-        if check_is_empty_or_no_selected_list[0] != "Error":
-            for counter in range(0, self.all_words_in_select_list.__len__(), 3):
-
-                for words in self.all_words_in_select_list[counter + 1]:
-                    if (polish_words.strip()).lower() == (words.strip()).lower():
-                        polish_repeat = True
+        internal_check_fields_is_not_empty = self.check_fields_is_not_empty(polish_words, english_words)
+        if internal_check_fields_is_not_empty[0] != "Error":
+            if self.all_words_in_select_list:
+                for counter in range(0, self.all_words_in_select_list.__len__(), 3):
+                    for words in self.all_words_in_select_list[counter + 1]:
+                        if (polish_words.strip()).lower() == (words.strip()).lower():
+                            polish_repeat = True
+                            break
+                    for words in self.all_words_in_select_list[counter + 2]:
+                        if (english_words.strip()).lower() == (words.strip()).lower():
+                            english_repeat = True
+                            break
+                    if polish_repeat and english_repeat:
                         break
-                for words in self.all_words_in_select_list[counter + 2]:
-                    if (english_words.strip()).lower() == (words.strip()).lower():
-                        english_repeat = True
-                        break
-
-                if polish_repeat == True and english_repeat == True:
-                    return ["Error", "The same word exist in list. In table number : {}".format(int(counter / 3 + 1))]
+                if polish_repeat and english_repeat:
+                    return [self.ERROR,
+                            "The same word exist in list. In table number : {}".format(int(counter / 3 + 1))]
                 elif counter == self.all_words_in_select_list.__len__() - 3:
                     return self.adding_word_for_list(
                         int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
+            else:
+                return self.adding_word_for_list(
+                    int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
         else:
-            return check_is_empty_or_no_selected_list
+            return internal_check_fields_is_not_empty
 
     def adding_word_for_list(self, counter, polish_word, english_word):
 

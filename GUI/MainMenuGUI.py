@@ -1,18 +1,16 @@
-from tkinter import *
-
 from LOGIC.MainMenuLogic import MenuLogic
 from GUI.CreateWordsListGUI import *
-from GUI.GuiLearning import *
+from GUI.LearningGUI import *
 
 
-class MainWindow(WordsWindow, GuiLearning, MenuLogic):
-    words_window = WordsWindow()
-    learning_window = GuiLearning()
+class MainWindow(MenuLogic):
+    create_words_list_gui = CreateWordsListGUI()
+    learning_gui = LearningGUI()
     menu_logic = MenuLogic()
 
     root = Tk()
-    add_words = None
-    add_words_pop = None
+    button_add_words = None
+    button_add_words_pop = None
 
     def main_menu(self):
         self.root.title("Words learning")
@@ -32,21 +30,14 @@ class MainWindow(WordsWindow, GuiLearning, MenuLogic):
         return "{}x{}+{}+{}".format(window_width, window_height, position_right, position_down)
 
     def set_buttons(self):
-        # Set two button
-        self.add_words = Button(self.root, text="Add new words list", bd=5,
-                                command=lambda: self.words_window.words_window_main(self.root))
-        self.add_words.grid(row=0, column=1, ipadx=25, pady=25)
+        self.button_add_words = Button(self.root, text="Add new words list", bd=5,
+                                       command=lambda: self.create_words_list_gui.words_window_main(self.root))
+        self.button_add_words.grid(row=0, column=1, ipadx=25, pady=25)
 
-        self.start_learning = Button(self.root, text="Start learning", bd=5,
-                                     command=lambda: self.learning_window.start_learning_menu(self.root))
+        self.button_add_words_pop = Button(self.root, text="Start learning", bd=5,
+                                           command=lambda: self.learning_gui.start_learning_menu(self.root))
 
-        self.start_learning.grid(row=0, column=2, ipadx=40, pady=25)
-
-    # def set_learning_window(self, learning_window):
-    #     self.learning_window = learning_window
-    #
-    # def get_learning_window(self):
-    #     return self.learning_window
+        self.button_add_words_pop.grid(row=0, column=2, ipadx=40, pady=25)
 
 
 def main():

@@ -6,17 +6,14 @@ from tkinter import ttk
 # Program create at system new directory about name "Words list" and stores in there files with words list
 
 
-class WordsWindow(WordWindowLogic):
-    word_window_logic = WordWindowLogic()
+class CreateWordsListGUI(CreateWordsListLogic):
+    word_window_logic = CreateWordsListLogic()
     main_menu_root = None
-    words_window_root = None
+    create_words_list_logic = None
 
     list_words_name = None
 
-    # Variable for test
-    listbox_with_folder = None
-
-    widget_option_menu_widget = None
+    widget_option_menu = None
 
     actual_list_word_lists = None
     list_with_words_lists_name = None
@@ -31,8 +28,6 @@ class WordsWindow(WordWindowLogic):
     label_currently_open_folder = None
     label_currently_open_file = None
 
-    selected = []
-
     def set_param_main_pop(self, main_menu_root) -> str:
         window_width = 1300
         window_height = 600
@@ -43,19 +38,17 @@ class WordsWindow(WordWindowLogic):
 
     def words_window_main(self, root):
         self.main_menu_root = root
+        # Create new folder in system
+        # self.word_window_logic.path_create_directory()
 
         self.actual_select_file = StringVar()
-
         # Create new top pop
-        self.words_window_root = Toplevel(self.main_menu_root)
+        self.create_words_list_logic = Toplevel(self.main_menu_root)
 
-        self.words_window_root.geometry(self.set_param_main_pop(self.main_menu_root))
+        self.create_words_list_logic.geometry(self.set_param_main_pop(self.main_menu_root))
 
         # Main pop set invisible
         self.main_menu_root.withdraw()
-
-        # Create new folder in system
-        self.word_window_logic.create_directory()
 
         # self.set_frame()
         self.changing_label_widget()
@@ -65,40 +58,20 @@ class WordsWindow(WordWindowLogic):
         self.button_widget()
 
         # Set windows close event
-        self.words_window_root.protocol("WM_DELETE_WINDOW", self.close_words_window)
+        self.create_words_list_logic.protocol("WM_DELETE_WINDOW", self.close_words_window)
         self.set_table()
-
-    # def set_frame(self):
-    #     frame_1 = LabelFrame(self.words_window_root, padx=50, pady=50)
-    #     frame_1.grid(row=0, column=0, columnspan=4)
-    #
-    #     # b1 = Button(frame_1, text="bla1")
-    #     # b1.grid(row=0, column=0, ipadx=70, pady=0)
-    #     # b2 = Button(frame_1, text="bla1")
-    #     # b2.grid(row=0, column=1, ipadx=70, pady=0)
-    #
-    #     label_currently_open_folder = Label(self.words_window_root,
-    #                                   text="Directory with word lists: {}                       ".format(
-    #                                       self.word_window_logic.dir_with_words_list),
-    #                                   fg="red", font='Helvetica 15 bold', padx=2)
-    #     label_currently_open_folder.grid(row=0, column=0, columnspan=3)
-    #
-    #     label_currently_open_file = Label(self.words_window_root,
-    #                                 textvariable=self.actual_select_file,
-    #                                 fg="dark green", font='Helvetica 15 bold', padx=2)
-    #     label_currently_open_file.grid(row=0, column=3, columnspan=2)
 
     # set all button
     def button_widget(self):
 
-        butt_save = Button(self.words_window_root, text="Save word list",
+        butt_save = Button(self.create_words_list_logic, text="Save word list",
                            command=lambda: [
                                self.info_popup(self.word_window_logic.file_create(self.list_words_name.get()))
                                , self.word_window_logic.file_list(), self.option_menu_widget()])
         butt_save.grid(row=1, column=2, ipadx=70, pady=0)
-        self.words_window_root.grid_columnconfigure(butt_save, minsize=1)
+        self.create_words_list_logic.grid_columnconfigure(butt_save, minsize=1)
 
-        butt_load = Button(self.words_window_root, text="Load",
+        butt_load = Button(self.create_words_list_logic, text="Load",
                            command=lambda: [self.set_table(), self.word_window_logic.open_file_and_return_words_list(
                                self.list_with_words_lists_name.get()),
                                             self.set_value_table(),
@@ -107,9 +80,9 @@ class WordsWindow(WordWindowLogic):
                                                     self.list_with_words_lists_name.get())),
                                             self.changing_label_widget()])
         butt_load.grid(row=1, column=4, ipadx=70, pady=0)
-        self.words_window_root.grid_columnconfigure(butt_load, minsize=1)
+        self.create_words_list_logic.grid_columnconfigure(butt_load, minsize=1)
 
-        butt_remove = Button(self.words_window_root, text="Remove",
+        butt_remove = Button(self.create_words_list_logic, text="Remove",
                              command=lambda: [self.set_table(), self.word_window_logic.remove_button(
                                  self.list_with_words_lists_name.get()),
                                               self.option_menu_widget(),
@@ -118,10 +91,10 @@ class WordsWindow(WordWindowLogic):
                                                       "None"))])
         butt_remove.grid(row=1, column=5, ipadx=70, pady=0)
 
-        butt_save = Button(self.words_window_root, text="Save words")
+        butt_save = Button(self.create_words_list_logic, text="Save words")
         butt_save.grid(row=4, column=4, ipadx=70, pady=0)
 
-        butt_add = Button(self.words_window_root, text="Add",
+        butt_add = Button(self.create_words_list_logic, text="Add",
                           command=lambda: [
                               self.info_popup(
                                   self.word_window_logic.whether_repeat_empty_field_and_no_selected_list(
@@ -130,16 +103,16 @@ class WordsWindow(WordWindowLogic):
                           ])
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
 
-        butt_remove = Button(self.words_window_root, text="Remove word",
+        butt_remove = Button(self.create_words_list_logic, text="Remove word",
                              command=lambda: [self.info_popup(self.word_window_logic.remove_word_from_lists()),
                                               self.set_value_table()])
         butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
 
-        butt_find = Button(self.words_window_root, text="Find", command=self.word_window_logic.find_word)
+        butt_find = Button(self.create_words_list_logic, text="Find", command=self.word_window_logic.find_word)
         butt_find.grid(row=2, column=6, ipadx=10, pady=25)
 
-        butt_back = Button(self.words_window_root, text="Back",
-                           command=lambda: self.word_window_logic.close_words_window(self.words_window_root,
+        butt_back = Button(self.create_words_list_logic, text="Back",
+                           command=lambda: self.word_window_logic.close_words_window(self.create_words_list_logic,
                                                                                      self.main_menu_root))
         butt_back.grid(row=4, column=0, ipadx=25, pady=25)
 
@@ -147,29 +120,29 @@ class WordsWindow(WordWindowLogic):
 
     def field_widget(self):
 
-        label_currently_open_file_first_version = Label(self.words_window_root,
+        label_currently_open_file_first_version = Label(self.create_words_list_logic,
                                                         text="Actual select file: None",
                                                         fg="dark green", font='Helvetica 15 bold', padx=2)
         label_currently_open_file_first_version.grid(row=0, column=3)
 
-        self.list_words_name = Entry(self.words_window_root, width=25, bd=5)
+        self.list_words_name = Entry(self.create_words_list_logic, width=25, bd=5)
         self.list_words_name.grid(row=1, column=1, ipadx=25, pady=25)
 
-        self.widget_entry_polish_word = Entry(self.words_window_root, width=25, bd=5)
+        self.widget_entry_polish_word = Entry(self.create_words_list_logic, width=25, bd=5)
         self.widget_entry_polish_word.grid(row=2, column=1, ipadx=25, pady=25)
 
-        self.widget_entry_english_word = Entry(self.words_window_root, width=25, bd=5)
+        self.widget_entry_english_word = Entry(self.create_words_list_logic, width=25, bd=5)
         self.widget_entry_english_word.grid(row=2, column=3, ipadx=25, pady=25)
 
     def changing_label_widget(self):
-        self.label_currently_open_folder = Label(self.words_window_root,
+        self.label_currently_open_folder = Label(self.create_words_list_logic,
                                                  text="Directory with word lists: {}                       ".format(
                                                      self.word_window_logic.dir_with_words_list),
                                                  fg="red", font='Helvetica 15 bold', padx=2)
         self.label_currently_open_folder.config(width=50)
         self.label_currently_open_folder.grid(row=0, column=0, columnspan=3, )
 
-        self.label_currently_open_file = Label(self.words_window_root,
+        self.label_currently_open_file = Label(self.create_words_list_logic,
                                                textvariable=self.actual_select_file,
                                                fg="dark green", font='Helvetica 15 bold', padx=2, anchor='w')
         self.label_currently_open_file.config(width=40)
@@ -177,22 +150,20 @@ class WordsWindow(WordWindowLogic):
 
     def label_widget(self):
 
-        label_set_name_file = Label(self.words_window_root, text="Choice words list name ")
+        label_set_name_file = Label(self.create_words_list_logic, text="Choice words list name ")
         label_set_name_file.grid(row=1, column=0)
 
-        lab_polish_word = Label(self.words_window_root, text="Polish word version:")
+        lab_polish_word = Label(self.create_words_list_logic, text="Polish word version:")
         lab_polish_word.grid(row=2, column=0)
 
-        lab_english_word = Label(self.words_window_root, text="English word version:")
+        lab_english_word = Label(self.create_words_list_logic, text="English word version:")
         lab_english_word.grid(row=2, column=2)
 
-        # lab_english_word = Label(self.words_window_root, text="Selected file")
-        # lab_english_word.grid(row=0, column=3)
-
     def set_table(self):
-        self.table_with_headers = ttk.Treeview(self.words_window_root, selectmode='browse')
+        self.table_with_headers = ttk.Treeview(self.create_words_list_logic, selectmode='browse')
         self.table_with_headers.grid(row=3, column=2, columnspan=2)
-        verscrlbar = ttk.Scrollbar(self.words_window_root, orient="vertical", command=self.table_with_headers.yview)
+        verscrlbar = ttk.Scrollbar(self.create_words_list_logic, orient="vertical",
+                                   command=self.table_with_headers.yview)
         verscrlbar.grid(row=3, column=3, sticky=N + S + E)
         self.table_with_headers.configure(xscrollcommand=verscrlbar.set)
 
@@ -227,10 +198,10 @@ class WordsWindow(WordWindowLogic):
         self.list_with_words_lists_name = StringVar()
         self.list_with_words_lists_name.set(self.actual_list_word_lists[0])
 
-        self.widget_option_menu_widget = OptionMenu(self.words_window_root, self.list_with_words_lists_name,
-                                                    *self.actual_list_word_lists)
-        self.widget_option_menu_widget.config(width=20)
-        self.widget_option_menu_widget.grid(row=1, column=3, ipadx=30)
+        self.widget_option_menu = OptionMenu(self.create_words_list_logic, self.list_with_words_lists_name,
+                                             *self.actual_list_word_lists)
+        self.widget_option_menu.config(width=20)
+        self.widget_option_menu.grid(row=1, column=3, ipadx=30)
 
     # Remember add_butt command return give 3 variable [type pop, information, new words list]
     def info_popup(self, info_list):
@@ -250,11 +221,6 @@ class WordsWindow(WordWindowLogic):
         self.word_window_logic.convert_value_from_table_to_remove(self.table_with_headers.item(cur_item))
 
     # def close_words_window(self):
-    #     self.words_window_root.destroy()
+    #     self.create_words_list_logic.destroy()
     #     self.main_menu_root.destroy()
     #     exit()
-
-    def test(self):
-        my_list = ["One", "Two", "Three"]
-        for i in range(0, 11):
-            self.listbox_with_folder.insert("end", "This is a number !!!!!!!!!!!!!!: {}".format(i))
