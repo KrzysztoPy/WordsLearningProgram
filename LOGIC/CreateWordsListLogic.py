@@ -179,21 +179,61 @@ class CreateWordsListLogic:
         else:
             return ["All right"]
 
+    def entry_words_separation(self, polish_words, english_words):
+        list_polish_words = []
+        list_english_words = []
+        polish_word = ""
+        english_word = ""
+
+        for count in range(0, polish_words.__len__()):
+            if polish_words[count] != ",":
+                polish_word += polish_words[count]
+                if count == polish_words.__len__() - 1:
+                    list_polish_words.append(polish_word)
+                    polish_word = ""
+            else:
+                list_polish_words.append(polish_word)
+                polish_word = ""
+
+        for count in range(0, english_words.__len__()):
+            if english_words[count] != ",":
+                english_word += english_words[count]
+                if count == english_words.__len__() - 1:
+                    list_english_words.append(english_word)
+                    english_word = ""
+            else:
+                list_english_words.append(english_word)
+                english_word = ""
+
+        return list_polish_words, list_english_words
+
     def whether_repeat_empty_field_and_no_selected_list(self, polish_words, english_words):
+        polish_repeated = 0
+        english_repeated = 0
         polish_repeat = False
         english_repeat = False
+
         internal_check_fields_is_not_empty = self.check_fields_is_not_empty(polish_words, english_words)
         if internal_check_fields_is_not_empty[0] != "Error":
+            list_polish_words, list_english_words = self.entry_words_separation(polish_words, english_words)
             if self.all_words_in_select_list:
                 for counter in range(0, self.all_words_in_select_list.__len__(), 3):
                     for words in self.all_words_in_select_list[counter + 1]:
-                        if (polish_words.strip()).lower() == (words.strip()).lower():
+                        for chosen_polish_word in list_polish_words:
+                            if (chosen_polish_word.strip()).lower() == (words.strip()).lower():
+                                polish_repeated += 1
+                        if polish_repeated == list_polish_words.__len__():
                             polish_repeat = True
-                            break
+                        else:
+                            polish_repeat = False
                     for words in self.all_words_in_select_list[counter + 2]:
-                        if (english_words.strip()).lower() == (words.strip()).lower():
+                        for chosen_english_word in list_english_words:
+                            if (chosen_english_word.strip()).lower() == (words.strip()).lower():
+                                english_repeated += 1
+                        if english_repeated == list_english_words.__len__():
                             english_repeat = True
-                            break
+                        else:
+                            english_repeat = False
                     if polish_repeat and english_repeat:
                         break
                 if polish_repeat and english_repeat:

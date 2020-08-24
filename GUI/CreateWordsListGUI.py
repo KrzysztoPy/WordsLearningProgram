@@ -207,7 +207,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def info_popup(self, info_list):
         if info_list[0] == "Error":
             messagebox.showerror(info_list[0], info_list[1])
-            pass
         elif info_list[0] == "Information":
             self.option_menu_widget()
             messagebox.showinfo(info_list[0], info_list[1])
