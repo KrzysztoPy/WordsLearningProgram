@@ -1,27 +1,15 @@
 from pathlib import Path
+from FileOperations.FileOperations import get_your_actual_path
 import os
 
 
-class MenuLogic():
-    dir_name = "Words list"
+class MenuLogic:
+    dir_name = "\Words list"
 
     def create_words_list_dir(self):
-        flag = False
-        file_path = os.path.realpath(__file__)
-        for i in file_path[::-1]:
-            if i == "\\":
-                if not flag:
-                    flag = True
-                else:
-                    file_path = file_path[:-1]
-                    break
-            else:
-                file_path = file_path[:-1]
+        file_path = get_your_actual_path()
         file_path += self.dir_name
+        print(file_path)
         Path(file_path).mkdir(exist_ok=True)
         if not Path(file_path).exists():
             exit()
-
-
-    # def destroy_learning_window_variable(self, learning_window):
-    #     learning_window.__del__(self)

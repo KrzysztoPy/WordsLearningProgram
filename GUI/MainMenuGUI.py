@@ -20,11 +20,9 @@ class MainWindow(MenuLogic):
         self.set_buttons()
         self.root.mainloop()
 
-    def set_main_pop(self, window_width, window_height) -> str:
-        # Set size view window
+    def set_main_pop(self, window_width, window_height):
         window_width = 335
         window_height = 75
-        # Set center position
         position_right = int(self.root.winfo_screenwidth() / 2 - window_width / 2)
         position_down = int(self.root.winfo_screenheight() / 2 - window_height / 2)
         return "{}x{}+{}+{}".format(window_width, window_height, position_right, position_down)
