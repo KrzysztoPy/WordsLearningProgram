@@ -1,14 +1,23 @@
+# from FileOperations.FileOperations import *
+import FileOperations.FileOperations as File_Oper
+
+import LOGIC.MainMenuLogic
 from tkinter import *
 from pathlib import Path
 import os
 
 
 class CreateWordsListLogic:
+    INITIAL_STATE = "Actual select file: None"
     ERROR = 'Error'
     INFORMATION = 'Information'
     SAVE = 'Save'
+
+    WITHOUT_ERROR = "Without error"
     dir_with_words_list = "Words list"
     name_actual_select_file = "None"
+
+    actual_state_popup = [WITHOUT_ERROR, "All rights"]
 
     list_all_words_list = []
     all_words_in_select_list = []
@@ -44,10 +53,11 @@ class CreateWordsListLogic:
         tmp_path += self.dir_with_words_list
         return tmp_path
 
-    def create_file(self, file_name):
-        tmp_path = self.words_list_path() + "\\" + file_name
-        open(tmp_path, "a").close()
-        return ["Information", "The file has been created"]
+    def create_new_empty_list(self, file_name_txt):
+        if File_Oper.create_new_empty_list(file_name_txt):
+            self.set_actual_state_popup([self.INFORMATION, "The file has been created"])
+        else:
+            self.set_actual_state_popup([self.ERROR, "The file was not created!!! Please try again"])
 
     def check_have_txt(self, file_name):
         tmp_path = ""
@@ -65,25 +75,28 @@ class CreateWordsListLogic:
             return file_name + ".txt"
 
     def file_list(self):
-        self.list_all_words_list = os.listdir(self.words_list_path())
 
-        if self.list_all_words_list.__len__() == 0:
-            self.list_all_words_list.append("Empty")
-        return self.list_all_words_list
+        if not self.actual_state_popup_diff_from_error():
+            self.list_all_words_list = os.listdir(File_Oper.get_path_to_folder_with_words_lists())
+
+            if self.list_all_words_list.__len__() == 0:
+                self.list_all_words_list.append("Empty")
+            return self.list_all_words_list
 
     def file_create(self, file_name):
+        file_name_txt = "\\" + file_name + ".txt"
+
         if file_name == "":
-            return ["Error", "File name can't be empty."]
+            self.set_actual_state_popup(["Error", "File name can't be empty."])
         elif file_name == ".txt":
-            return ["Error", "Prohibited file name: .txt"]
-        file_path = self.words_list_path() + "\\" + self.check_have_txt(file_name)
-        if os.path.exists(file_path):
-            return ["Error", "A file with this name already exists.Choice different name. "]
+            self.set_actual_state_popup(["Error", "Prohibited file name: .txt"])
+        if File_Oper.which_file_exsist(file_name_txt):
+            self.set_actual_state_popup(["Error", "A file with this name already exists. Choice different name. "])
         else:
-            return self.create_file(self.check_have_txt(file_name))
+            return self.create_new_empty_list(file_name_txt)
 
     def open_file_and_return_words_list(self, file_name):
-        tmp_path = self.words_list_path() + "\\" + file_name
+        tmp_path = File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name
         list_words = open(tmp_path, "r", encoding="utf=8")
         data_from_file = list_words.read()
         file_data = "".join(data_from_file)
@@ -112,7 +125,6 @@ class CreateWordsListLogic:
                 if j == ",":
                     polish_all_translations.append(polish_words)
                     polish_words = ""
-                    # polish_words += j + " "
                 else:
                     polish_words += j
             elif j == "|":
@@ -127,7 +139,6 @@ class CreateWordsListLogic:
                     english_words += j
             elif j == ";":
                 english_all_translations.append(english_words)
-                english_words = ""
                 words_list += [counter, polish_all_translations.copy(), english_all_translations.copy()]
                 counter += 1
 
@@ -138,6 +149,15 @@ class CreateWordsListLogic:
                 english_all_translations.clear()
         self.set_all_words_in_select_list(words_list.copy())
         return self.get_all_words_in_select_list()
+
+    # def set_table_value(self):
+    #     print("Set table")
+    #     for counter in range(0, self.get_all_words_in_select_list().__len__(), 3):
+    #         yield counter
+    #         print(counter)
+
+    def set_actual_selected_file(self):
+        return self.INITIAL_STATE
 
     def return_words_line(self, counter):
         tmp_all_words_on_selected_list = self.get_all_words_in_select_list()
@@ -310,6 +330,12 @@ class CreateWordsListLogic:
         self.convert_value_from_click_table_event.clear()
         return [self.INFORMATION, "Remove word from table!!!"]
 
+    def set_actual_state_popup(self, actual_state_popup):
+        self.actual_state_popup = actual_state_popup
+
+    def get_actual_state_popup(self):
+        return self.actual_state_popup
+
     def save_to_table(self, polish_word, english_word):
         # tmp_words = []
         # index = 0
@@ -337,6 +363,9 @@ class CreateWordsListLogic:
     def close_words_window(self, top_window, main_window):
         top_window.destroy()
         main_window.deiconify()
+
+    def actual_state_popup_diff_from_error(self):
+        return self.actual_state_popup == self.ERROR
 
     # def test():
     #     # logic = Logic()
