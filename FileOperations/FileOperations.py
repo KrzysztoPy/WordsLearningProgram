@@ -29,3 +29,11 @@ def create_new_empty_list(file_name_txt):
     tmp_path = get_path_to_folder_with_words_lists() + file_name_txt
     open(tmp_path, "a").close()
     return which_file_exsist(file_name_txt)
+
+
+def return_lists_file_in_path(path):
+    return os.listdir(path)
+
+def open_file_and_get_content(path):
+
+    return open(path, "r", encoding="utf=8")

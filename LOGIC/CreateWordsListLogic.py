@@ -77,7 +77,9 @@ class CreateWordsListLogic:
     def file_list(self):
 
         if not self.actual_state_popup_diff_from_error():
-            self.list_all_words_list = os.listdir(File_Oper.get_path_to_folder_with_words_lists())
+            self.list_all_words_list = File_Oper.return_lists_file_in_path(
+                File_Oper.get_path_to_folder_with_words_lists())
+            # self.list_all_words_list = os.listdir((File_Oper.get_path_to_folder_with_words_lists()))
 
             if self.list_all_words_list.__len__() == 0:
                 self.list_all_words_list.append("Empty")
@@ -96,8 +98,10 @@ class CreateWordsListLogic:
             return self.create_new_empty_list(file_name_txt)
 
     def open_file_and_return_words_list(self, file_name):
-        tmp_path = File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name
-        list_words = open(tmp_path, "r", encoding="utf=8")
+        # tmp_path = File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name
+        list_words = File_Oper.open_file_and_get_content(
+            File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name)
+        # list_words = open(tmp_path, "r", encoding="utf=8")
         data_from_file = list_words.read()
         file_data = "".join(data_from_file)
         return self.set_list_with_words_from_file(file_data)

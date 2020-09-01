@@ -21,7 +21,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
     label_currently_open_file = None
 
     def size_and_position_main_window(self, main_menu_root):
-        main_window_width = 1300
+        main_window_width = 1350
         main_window_height = 600
         position_from_right_side_screen = int(main_menu_root.winfo_screenwidth() / 2 - main_window_width / 2)
         position_from_left_side_screen = int(main_menu_root.winfo_screenheight() / 2 - main_window_height / 2)
@@ -80,20 +80,22 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def button_save_words_list(self):
         butt_save = Button(self.create_words_list_logic, text="Save word list",
                            command=lambda: [self.create_words_list_logic_class.file_create(self.list_words_name.get()),
-                                            self.create_words_list_logic_class.file_list(),
                                             self.option_menu_widget_list_with_words_list(),
+                                            self.info_popup(
+                                                self.create_words_list_logic_class.get_actual_state_popup()),
                                             self.create_words_list_logic_class.set_actual_state_popup(
-                                                self.create_words_list_logic_class.WITHOUT_ERROR), self.info_popup(
-                                   self.create_words_list_logic_class.get_actual_state_popup())])
+                                                self.create_words_list_logic_class.WITHOUT_ERROR)])
         butt_save.grid(row=1, column=2, ipadx=70, pady=0)
         self.create_words_list_logic.grid_columnconfigure(butt_save, minsize=1)
 
     def option_menu_widget_list_with_words_list(self):
-        if not self.create_words_list_logic_class.actual_state_popup_diff_from_error():
-            self.actual_list_word_lists = self.create_words_list_logic_class.file_list()
-            self.list_with_words_lists_name = StringVar()
-            self.list_with_words_lists_name.set(self.actual_list_word_lists[0])
 
+        if self.create_words_list_logic_class.get_actual_state_popup()[0] \
+                != self.create_words_list_logic_class.ERROR:
+            self.list_with_words_lists_name = StringVar()
+            self.actual_list_word_lists = self.create_words_list_logic_class.file_list()
+
+            self.list_with_words_lists_name.set(self.actual_list_word_lists[0])
             self.widget_option_menu = OptionMenu(self.create_words_list_logic, self.list_with_words_lists_name,
                                                  *self.actual_list_word_lists)
             self.widget_option_menu.config(width=20)
@@ -105,7 +107,8 @@ class CreateWordsListGUI(CreateWordsListLogic):
                            # Remove self.set_table()
                            command=lambda: [
                                self.create_words_list_logic_class.open_file_and_return_words_list(
-                                   self.list_with_words_lists_name.get()), self.clean_previous_data_from_table(),
+                                   self.list_with_words_lists_name.get()),
+                               self.clean_previous_data_from_table(),
                                self.set_value_table(),
                                self.actual_select_file_string_var.set(
                                    self.create_words_list_logic_class.actual_select_file_string_set(
@@ -202,12 +205,12 @@ class CreateWordsListGUI(CreateWordsListLogic):
 
     # Remember add_butt command return give 3 variable [type pop, information, new words list]
     def info_popup(self, info_list):
-        if info_list[0] == "Error":
+        if info_list[0] == self.create_words_list_logic_class.ERROR:
             messagebox.showerror(info_list[0], info_list[1])
-        elif info_list[0] == "Information":
+        elif info_list[0] == self.create_words_list_logic_class.INFORMATION:
             self.option_menu_widget_list_with_words_list()
             messagebox.showinfo(info_list[0], info_list[1])
-        elif info_list[0] == "Save":
+        elif info_list[0] == self.create_words_list_logic_class.SAVE:
             self.set_table()
             self.set_value_table()
             messagebox.showinfo(info_list[0], info_list[1])
