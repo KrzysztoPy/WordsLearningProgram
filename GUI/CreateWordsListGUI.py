@@ -42,12 +42,21 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.label_widget_unchanging()
         self.actual_select_file_string_var.set(self.create_words_list_logic_class.set_actual_selected_file())
 
+        # button New
+        self.button_save_file_words_list()
+        self.button_load_choose_words_list()
+        self.button_remove_words_list()
+        self.button_tmp_add_new_words_from_list()
+        self.button_remove_tmp_add_words_from_list()
+        self.button_find_words_in_actual_chooser_list()
+        self.button_back_to_earlier_menu()
+        self.button_save_a_list__with_new_added_words()
+
         # Old
         self.label_displays_actual_select_file()
-        self.button_save_words_list()
+
         self.field_widget()
         self.option_menu_widget_list_with_words_list()
-        self.button_widget()
 
         # Set windows close event
         self.create_words_list_logic.protocol("WM_DELETE_WINDOW", self.close_words_window)
@@ -77,17 +86,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.label_currently_open_file.config(width=40)
         self.label_currently_open_file.grid(row=0, column=2, columnspan=2, sticky=E)
 
-    def button_save_words_list(self):
-        butt_save = Button(self.create_words_list_logic, text="Save word list",
-                           command=lambda: [self.create_words_list_logic_class.file_create(self.list_words_name.get()),
-                                            self.option_menu_widget_list_with_words_list(),
-                                            self.info_popup(
-                                                self.create_words_list_logic_class.get_actual_state_popup()),
-                                            self.create_words_list_logic_class.set_actual_state_popup(
-                                                self.create_words_list_logic_class.WITHOUT_ERROR)])
-        butt_save.grid(row=1, column=2, ipadx=70, pady=0)
-        self.create_words_list_logic.grid_columnconfigure(butt_save, minsize=1)
-
     def option_menu_widget_list_with_words_list(self):
 
         if self.create_words_list_logic_class.get_actual_state_popup()[0] \
@@ -101,8 +99,18 @@ class CreateWordsListGUI(CreateWordsListLogic):
             self.widget_option_menu.config(width=20)
             self.widget_option_menu.grid(row=1, column=3, ipadx=30)
 
-    def button_widget(self):
+    def button_save_file_words_list(self):
+        butt_save = Button(self.create_words_list_logic, text="Save word list",
+                           command=lambda: [self.create_words_list_logic_class.file_create(self.list_words_name.get()),
+                                            self.option_menu_widget_list_with_words_list(),
+                                            self.info_popup(
+                                                self.create_words_list_logic_class.get_actual_state_popup()),
+                                            self.create_words_list_logic_class.set_actual_state_popup(
+                                                self.create_words_list_logic_class.WITHOUT_ERROR)])
+        butt_save.grid(row=1, column=2, ipadx=70, pady=0)
+        self.create_words_list_logic.grid_columnconfigure(butt_save, minsize=1)
 
+    def button_load_choose_words_list(self):
         butt_load = Button(self.create_words_list_logic, text="Load",
                            # Remove self.set_table()
                            command=lambda: [
@@ -118,7 +126,8 @@ class CreateWordsListGUI(CreateWordsListLogic):
         butt_load.grid(row=1, column=4, ipadx=70, pady=0)
         self.create_words_list_logic.grid_columnconfigure(butt_load, minsize=1)
 
-        butt_remove = Button(self.create_words_list_logic, text="Remove",
+    def button_remove_words_list(self):
+        butt_remove = Button(self.create_words_list_logic, text="Remove words list",
                              # self.set_table(),
                              command=lambda: [self.clean_previous_data_from_table(),
                                               self.create_words_list_logic_class.remove_button(
@@ -127,12 +136,10 @@ class CreateWordsListGUI(CreateWordsListLogic):
                                               self.actual_select_file_string_var.set(
                                                   self.create_words_list_logic_class.actual_select_file_string_set(
                                                       "None"))])
-        butt_remove.grid(row=1, column=5, ipadx=70, pady=0)
+        butt_remove.grid(row=1, column=5, columnspan=2, ipadx=70, pady=0)
 
-        butt_save = Button(self.create_words_list_logic, text="Save words")
-        butt_save.grid(row=4, column=4, ipadx=70, pady=0)
-
-        butt_add = Button(self.create_words_list_logic, text="Add",
+    def button_tmp_add_new_words_from_list(self):
+        butt_add = Button(self.create_words_list_logic, text="Add words",
                           command=lambda: [
                               self.info_popup(
                                   self.create_words_list_logic_class.whether_repeat_empty_field_and_no_selected_list(
@@ -141,23 +148,31 @@ class CreateWordsListGUI(CreateWordsListLogic):
                           ])
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
 
+    def button_remove_tmp_add_words_from_list(self):
         butt_remove = Button(self.create_words_list_logic, text="Remove word",
                              command=lambda: [
-                                 self.info_popup(self.create_words_list_logic_class.remove_word_from_lists()),
-                                 self.set_value_table()])
+                                 self.remove_words(),
+                                 self.set_table(),
+                                 self.set_value_table(),
+                                 self.info_popup(self.create_words_list_logic_class.remove_word_from_lists())
+                             ])
         butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
 
+    def button_find_words_in_actual_chooser_list(self):
         butt_find = Button(self.create_words_list_logic, text="Find",
                            command=self.create_words_list_logic_class.find_word)
         butt_find.grid(row=2, column=6, ipadx=10, pady=25)
 
+    def button_back_to_earlier_menu(self):
         butt_back = Button(self.create_words_list_logic, text="Back",
                            command=lambda: self.create_words_list_logic_class.close_words_window(
                                self.create_words_list_logic,
                                self.main_menu_root))
         butt_back.grid(row=4, column=0, ipadx=25, pady=25)
 
-        # set all field
+    def button_save_a_list__with_new_added_words(self):
+        butt_save = Button(self.create_words_list_logic, text="Save words")
+        butt_save.grid(row=4, column=4, ipadx=70, pady=0)
 
     def field_widget(self):
 
@@ -169,6 +184,11 @@ class CreateWordsListGUI(CreateWordsListLogic):
 
         self.widget_entry_english_word = Entry(self.create_words_list_logic, width=25, bd=5)
         self.widget_entry_english_word.grid(row=2, column=3, ipadx=25, pady=25)
+
+    def remove_words(self):
+        clicked_elem = ('<Double-1>', self.on_select)
+        print(clicked_elem)
+        # self.table_with_headers.bind('<Double-1>', self.on_select)
 
     def set_table(self):
         self.table_with_headers = ttk.Treeview(self.create_words_list_logic, selectmode='browse')
@@ -203,7 +223,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def clean_previous_data_from_table(self):
         self.table_with_headers.delete(*self.table_with_headers.get_children())
 
-    # Remember add_butt command return give 3 variable [type pop, information, new words list]
     def info_popup(self, info_list):
         if info_list[0] == self.create_words_list_logic_class.ERROR:
             messagebox.showerror(info_list[0], info_list[1])
@@ -211,7 +230,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
             self.option_menu_widget_list_with_words_list()
             messagebox.showinfo(info_list[0], info_list[1])
         elif info_list[0] == self.create_words_list_logic_class.SAVE:
-            self.set_table()
+
             self.set_value_table()
             messagebox.showinfo(info_list[0], info_list[1])
 

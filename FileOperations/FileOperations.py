@@ -34,6 +34,6 @@ def create_new_empty_list(file_name_txt):
 def return_lists_file_in_path(path):
     return os.listdir(path)
 
-def open_file_and_get_content(path):
 
+def open_file_and_get_content(path):
     return open(path, "r", encoding="utf=8")

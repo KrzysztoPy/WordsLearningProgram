@@ -23,6 +23,7 @@ class CreateWordsListLogic:
     all_words_in_select_list = []
     # list_with_new_adding_words = []
     actual_adding_word = []
+    which_whatever_lists_is_load = False
 
     convert_value_from_click_table_event = []
 
@@ -98,10 +99,8 @@ class CreateWordsListLogic:
             return self.create_new_empty_list(file_name_txt)
 
     def open_file_and_return_words_list(self, file_name):
-        # tmp_path = File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name
         list_words = File_Oper.open_file_and_get_content(
             File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name)
-        # list_words = open(tmp_path, "r", encoding="utf=8")
         data_from_file = list_words.read()
         file_data = "".join(data_from_file)
         return self.set_list_with_words_from_file(file_data)
@@ -152,13 +151,14 @@ class CreateWordsListLogic:
                 english_words = ""
                 english_all_translations.clear()
         self.set_all_words_in_select_list(words_list.copy())
+        self.set_which_whatever_lists_is_load(True)
         return self.get_all_words_in_select_list()
 
-    # def set_table_value(self):
-    #     print("Set table")
-    #     for counter in range(0, self.get_all_words_in_select_list().__len__(), 3):
-    #         yield counter
-    #         print(counter)
+    def set_which_whatever_lists_is_load(self, which_load_list):
+        self.which_whatever_lists_is_load = which_load_list
+
+    def get_which_whatever_lists_is_load(self):
+        return self.which_whatever_lists_is_load
 
     def set_actual_selected_file(self):
         return self.INITIAL_STATE
