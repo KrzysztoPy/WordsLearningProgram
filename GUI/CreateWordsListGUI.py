@@ -43,7 +43,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.actual_select_file_string_var.set(self.create_words_list_logic_class.set_actual_selected_file())
 
         # button New
-        self.button_save_file_words_list()
+        self.button_add_new_words_list()
         self.button_load_choose_words_list()
         self.button_remove_words_list()
         self.button_tmp_add_new_words_from_list()
@@ -91,7 +91,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
         if self.create_words_list_logic_class.get_actual_state_popup()[0] \
                 != self.create_words_list_logic_class.ERROR:
             self.list_with_words_lists_name = StringVar()
-            self.actual_list_word_lists = self.create_words_list_logic_class.file_list()
+            self.actual_list_word_lists = self.create_words_list_logic_class.get_list_name_words_lists()
 
             self.list_with_words_lists_name.set(self.actual_list_word_lists[0])
             self.widget_option_menu = OptionMenu(self.create_words_list_logic, self.list_with_words_lists_name,
@@ -99,16 +99,28 @@ class CreateWordsListGUI(CreateWordsListLogic):
             self.widget_option_menu.config(width=20)
             self.widget_option_menu.grid(row=1, column=3, ipadx=30)
 
-    def button_save_file_words_list(self):
-        butt_save = Button(self.create_words_list_logic, text="Save word list",
-                           command=lambda: [self.create_words_list_logic_class.file_create(self.list_words_name.get()),
-                                            self.option_menu_widget_list_with_words_list(),
-                                            self.info_popup(
-                                                self.create_words_list_logic_class.get_actual_state_popup()),
-                                            self.create_words_list_logic_class.set_actual_state_popup(
-                                                self.create_words_list_logic_class.WITHOUT_ERROR)])
-        butt_save.grid(row=1, column=2, ipadx=70, pady=0)
-        self.create_words_list_logic.grid_columnconfigure(butt_save, minsize=1)
+    def button_add_new_words_list(self):
+        butt_add_new_words_list = Button(self.create_words_list_logic, text="Add new word list",
+                                         command=self.logic_to_use_button_add_new_words_list)
+        butt_add_new_words_list.grid(row=1, column=2, ipadx=70, pady=0)
+        self.create_words_list_logic.grid_columnconfigure(butt_add_new_words_list, minsize=1)
+
+    def logic_to_use_button_add_new_words_list(self):
+        new_name_a_file = self.list_words_name.get()
+        repeated_name = ["", "", True]
+
+        repeated_name = self.create_words_list_logic_class.check_whether_exists_file_with_the_same_name(new_name_a_file)
+        self.info_popup(repeated_name)
+
+        if not repeated_name[2]:
+            repeated_name = self.create_words_list_logic_class.create_new_empty_list(new_name_a_file)
+            self.info_popup(repeated_name)
+            if repeated_name[2]:
+                self.create_words_list_logic_class.clear_words_list_name(self.list_words_name)
+                self.option_menu_widget_list_with_words_list()
+                # self.create_words_list_logic_class.file_create(self.list_words_name.get())
+                # self.info_popup(self.create_words_list_logic_class.get_actual_state_popup())
+                # self.create_words_list_logic_class.set_actual_state_popup(self.create_words_list_logic_class.WITHOUT_ERROR)
 
     def button_load_choose_words_list(self):
         butt_load = Button(self.create_words_list_logic, text="Load",
@@ -129,13 +141,18 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def button_remove_words_list(self):
         butt_remove = Button(self.create_words_list_logic, text="Remove words list",
                              # self.set_table(),
-                             command=lambda: [self.clean_previous_data_from_table(),
-                                              self.create_words_list_logic_class.remove_button(
-                                                  self.list_with_words_lists_name.get()),
-                                              self.option_menu_widget_list_with_words_list(),
-                                              self.actual_select_file_string_var.set(
-                                                  self.create_words_list_logic_class.actual_select_file_string_set(
-                                                      "None"))])
+                             command=lambda: [
+                                 self.set_table_with_headers(
+                                     self.create_words_list_logic_class.whether_remove_lists_is_selected(
+                                         self.list_with_words_lists_name.get(), self.table_with_headers)),
+                                 # self.clean_previous_data_from_table(),
+                                 self.create_words_list_logic_class.remove_button(
+                                     self.list_with_words_lists_name.get()),
+                                 self.option_menu_widget_list_with_words_list(),
+
+                                 self.actual_select_file_string_var.set(
+                                     self.create_words_list_logic_class.actual_select_file_string_set(
+                                         "None"))])
         butt_remove.grid(row=1, column=5, columnspan=2, ipadx=70, pady=0)
 
     def button_tmp_add_new_words_from_list(self):
@@ -222,6 +239,9 @@ class CreateWordsListGUI(CreateWordsListLogic):
 
     def clean_previous_data_from_table(self):
         self.table_with_headers.delete(*self.table_with_headers.get_children())
+
+    def set_table_with_headers(self, table_with_headers):
+        self.table_with_headers = table_with_headers
 
     def info_popup(self, info_list):
         if info_list[0] == self.create_words_list_logic_class.ERROR:

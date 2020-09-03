@@ -1,6 +1,5 @@
 # from FileOperations.FileOperations import *
 import FileOperations.FileOperations as File_Oper
-
 import LOGIC.MainMenuLogic
 from tkinter import *
 from pathlib import Path
@@ -26,6 +25,20 @@ class CreateWordsListLogic:
     which_whatever_lists_is_load = False
 
     convert_value_from_click_table_event = []
+
+    def clear_words_list_name(self, entry_tkinter):
+        entry_tkinter.delete(0, 'end')
+
+    def check_whether_exists_file_with_the_same_name(self, new_name_a_file):
+
+        if new_name_a_file == "":
+            return (["Error", "File name can't be empty.", True])
+        elif new_name_a_file == ".txt":
+            return (["Error", "Prohibited file name: .txt", True])
+        if File_Oper.which_file_exsist(new_name_a_file):
+            return (["Error", "A file with this name already exists. Choice different name. ", True])
+        else:
+            return (["All right", "Don't exsist file with the same name", False])
 
     def save_new_words_list(self, words=[]):
         return words.__len__() < 1
@@ -55,10 +68,7 @@ class CreateWordsListLogic:
         return tmp_path
 
     def create_new_empty_list(self, file_name_txt):
-        if File_Oper.create_new_empty_list(file_name_txt):
-            self.set_actual_state_popup([self.INFORMATION, "The file has been created"])
-        else:
-            self.set_actual_state_popup([self.ERROR, "The file was not created!!! Please try again"])
+        return File_Oper.create_new_empty_list(file_name_txt)
 
     def check_have_txt(self, file_name):
         tmp_path = ""
@@ -75,7 +85,7 @@ class CreateWordsListLogic:
             file_name = file_name[::-1]
             return file_name + ".txt"
 
-    def file_list(self):
+    def get_list_name_words_lists(self):
 
         if not self.actual_state_popup_diff_from_error():
             self.list_all_words_list = File_Oper.return_lists_file_in_path(
@@ -334,11 +344,24 @@ class CreateWordsListLogic:
         self.convert_value_from_click_table_event.clear()
         return [self.INFORMATION, "Remove word from table!!!"]
 
+    def whether_remove_lists_is_selected(self, table_with_headers, actual_selected_list):
+        if self.get_name_actual_select_file() == actual_selected_list:
+            return table_with_headers.delete.delete(*table_with_headers.get_children())
+
+    def remove_data_from_table(self, table_with_headers):
+        return table_with_headers.delete.delete(*table_with_headers.get_children())
+
     def set_actual_state_popup(self, actual_state_popup):
         self.actual_state_popup = actual_state_popup
 
     def get_actual_state_popup(self):
         return self.actual_state_popup
+
+    def get_message_cons_error(self):
+        return self.ERROR
+
+    def get_message_cons_save(self):
+        return self.SAVE
 
     def save_to_table(self, polish_word, english_word):
         # tmp_words = []
