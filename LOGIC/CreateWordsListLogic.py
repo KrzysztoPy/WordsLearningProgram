@@ -9,6 +9,7 @@ import os
 class CreateWordsListLogic:
     NOTHING_SELECTED = "Nothing"
     INITIAL_STATE = "Actual select file: "
+    INITIAL_STATE_WORD = "Actual select words: "
     ERROR = 'Error'
     INFORMATION = 'Information'
     SAVE = 'Save'
@@ -25,6 +26,8 @@ class CreateWordsListLogic:
     all_words_in_select_list = []
     actual_adding_word = []
     convert_value_from_click_table_event = []
+    new_adding_words_to_actual_list = []
+    added_new_words = False
 
     # New -> add_new_converted_words_list
     def clear_converted_words_list_name(self, entry_tkinter):
@@ -142,6 +145,9 @@ class CreateWordsListLogic:
     def set_actual_selected_file(self):
         return self.INITIAL_STATE
 
+    def set_actual_selected_words(self):
+        return self.INITIAL_STATE_WORD
+
     def return_separated_individual_elem(self, counter):
         return (self.get_converted_words_from_selected_list()[counter],
                 ",".join(self.get_converted_words_from_selected_list()[counter + 1]),
@@ -243,21 +249,18 @@ class CreateWordsListLogic:
                     return [self.ERROR,
                             "The same word exist in list. In table number : {}".format(int(counter / 3 + 1))]
                 elif counter == self.all_words_in_select_list.__len__() - 3:
-                    return self.adding_word_for_list(
-                        int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
-            else:
-                return self.adding_word_for_list(
-                    int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
+                    return self.add_new_word_to_list(int(self.all_words_in_select_list.__len__() / 3) + 1,
+                                                     [polish_words], [english_words])
         else:
             return check_fields_is_not_empty
 
-    def adding_word_for_list(self, counter, polish_word, english_word):
-
-        tmp_all_words = self.get_converted_words_from_selected_list()
-        tmp_all_words.append(counter)
-        tmp_all_words.append(polish_word)
-        tmp_all_words.append(english_word)
-        self.set_converted_words_from_selected_list(tmp_all_words.copy())
+    def add_new_word_to_list(self, counter, polish_word, english_word):
+        new_adding_words_to_actual_list = self.get_converted_words_from_selected_list()
+        new_adding_words_to_actual_list.append(counter)
+        new_adding_words_to_actual_list.append(polish_word)
+        new_adding_words_to_actual_list.append(english_word)
+        self.set_converted_words_from_selected_list(new_adding_words_to_actual_list)
+        self.set_added_new_words(True)
         return [self.INFORMATION, "Adding new word to list"]
 
     def check_change(self, polish_word, english_word):
@@ -283,7 +286,9 @@ class CreateWordsListLogic:
                 convert_value_from_table.append(new_list_with_convert_words.copy())
             else:
                 convert_value_from_table.append(value)
-        self.convert_value_from_click_table_event = convert_value_from_table
+        if not convert_value_from_table:
+            convert_value_from_table = self.set_actual_selected_words() + self.NOTHING_SELECTED
+        self.set_convert_value_from_click_table_event(convert_value_from_table)
 
     def remove_word_from_lists(self):
         if not self.convert_value_from_click_table_event:
@@ -318,9 +323,6 @@ class CreateWordsListLogic:
             return table_with_headers.delete.delete(*table_with_headers.get_children())
 
     def remove_list_which_is_load(self, actual_selected_list):
-        print(self.get_name_actual_select_file())
-        print(actual_selected_list)
-        print(self.get_name_actual_select_file() == actual_selected_list)
         return self.get_name_actual_select_file().__str__() == actual_selected_list
 
     def remove_data_from_table(self, table_with_headers):
@@ -348,13 +350,58 @@ class CreateWordsListLogic:
         return list_with_words_lists_name.__str__() != self.EMPTY_FILE
 
     def which_list_with_words_list_is_not_empty(self, selected_file_to_remove):
-        return selected_file_to_remove != self.EMPTY_FILE
+        return selected_file_to_remove != self.NOTHING_SELECTED
 
     def set_list_all_converted_words_list(self, list_all_converted_words_list):
         self.list_all_converted_words_list = list_all_converted_words_list
 
     def get_list_all_converted_words_list(self) -> []:
         return self.list_all_converted_words_list
+
+    def get_new_adding_words_to_actual_list(self):
+        return self.new_adding_words_to_actual_list
+
+    def set_new_adding_words_to_actual_list(self, new_adding_words_to_actual_list):
+        self.new_adding_words_to_actual_list = new_adding_words_to_actual_list
+
+    def get_added_new_words(self):
+        return self.added_new_words
+
+    def set_added_new_words(self, added_new_words):
+        self.added_new_words = added_new_words
+
+    def get_convert_value_from_click_table_event(self):
+        return self.convert_value_from_click_table_event
+
+    def set_convert_value_from_click_table_event(self, convert_value_from_click_table_event):
+        self.convert_value_from_click_table_event = convert_value_from_click_table_event
+
+    def get_convert_by_view_value_from_click_table_event(self):
+        copy_list = self.convert_value_from_click_table_event
+        copy_list = self.add_white_sign(copy_list, self.check_which_words_is_the_biggest(copy_list))
+        print(copy_list)
+        return "{:<} \n PL: {:<}  \n  Eng: {:<}".format(copy_list[0], "".join(copy_list[1]),
+                                                        "".join(copy_list[2]))
+        # return "{} \n PL: {}  \n  Eng: {}".format("", "".join(copy_list[1]),
+        #                                           "".join(copy_list[2]))
+
+    def check_which_words_is_the_biggest(self, copy_list):
+        the_biggest = 0
+        print(copy_list.__len__())
+        for i in range(0, copy_list.__len__()):
+            if copy_list[i].__str__().__len__() > the_biggest:
+                the_biggest = copy_list[i].__str__().__len__()
+        return the_biggest
+
+    def add_white_sign(self, copy_list, the_biggest):
+        print("The biggest {}".format(the_biggest))
+
+        for i in range(0, copy_list.__len__()):
+            tmp = copy_list[i]
+            str(tmp)
+            print(type(tmp))
+            tmp += " " * (the_biggest - copy_list[i].__str__().__len__())
+            copy_list[i] = tmp
 
     def save_to_table(self, polish_word, english_word):
         # tmp_words = []

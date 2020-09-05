@@ -56,5 +56,5 @@ def remove_file(file_name):
     try:
         os.remove(get_path_to_folder_with_words_lists() + "\\" + file_name)
         return [INFORMATION, "{} has been removed".format(file_name)]
-    except IOError as message_exception:
-        return [ERROR, str(message_exception), False]
+    except IOError:
+        return [ERROR, "The file you want to delete does not exist!", False]

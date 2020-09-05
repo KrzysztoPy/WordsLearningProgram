@@ -17,11 +17,13 @@ class CreateWordsListGUI(CreateWordsListLogic):
     widget_entry_polish_word = None
     widget_entry_english_word = None
     actual_select_file_string_var = None
+    label_currently_selected_word_var = None
+    label_currently_selected_word = None
     label_currently_open_folder = None
     label_currently_open_file = None
 
     def size_and_position_main_window(self, main_menu_root):
-        main_window_width = 1350
+        main_window_width = 1400
         main_window_height = 600
         position_from_right_side_screen = int(main_menu_root.winfo_screenwidth() / 2 - main_window_width / 2)
         position_from_left_side_screen = int(main_menu_root.winfo_screenheight() / 2 - main_window_height / 2)
@@ -31,6 +33,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def words_window_main(self, root):
         self.main_menu_root = root
         self.actual_select_file_string_var = StringVar()
+        self.label_currently_selected_word_var = StringVar()
 
         self.create_words_list_logic = Toplevel(self.main_menu_root)
         self.create_words_list_logic.geometry(self.size_and_position_main_window(self.main_menu_root))
@@ -43,6 +46,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.actual_select_file_string_var.set(
             self.create_words_list_logic_class.set_actual_selected_file() +
             self.create_words_list_logic_class.NOTHING_SELECTED)
+        self.label_currently_selected_word_var_initial_state()
 
         # button New
         self.button_add_new_words_list()
@@ -52,9 +56,10 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.button_remove_tmp_add_words_from_list()
         self.button_find_words_in_actual_chooser_list()
         self.button_back_to_earlier_menu()
-        self.button_save_a_list__with_new_added_words()
+        self.button_save_a_list_with_new_added_words()
         self.create_words_list_logic_class.set_name_actual_select_file(
             self.create_words_list_logic_class.NOTHING_SELECTED)
+        self.label_displays_actual_selected_word()
         # Old
         self.label_displays_actual_select_file()
 
@@ -150,12 +155,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
         if self.create_words_list_logic_class.which_list_with_words_list_is_not_empty(selected_file_to_remove):
             self.info_popup(self.create_words_list_logic_class.butt_remove_file(selected_file_to_remove))
 
-            # self.set_table_with_headers(
-            #     self.create_words_list_logic_class.whether_remove_lists_is_selected(
-            #         self.list_with_words_lists_name.get(), self.table_with_headers))
-            # self.create_words_list_logic_class.fi(
-            #     self.list_with_words_lists_name.get())
-            # self.option_menu_widget_list_with_words_list()
             if self.create_words_list_logic_class.remove_list_which_is_load(selected_file_to_remove):
                 self.actual_select_file_string_var.set(
                     self.create_words_list_logic_class.set_actual_selected_file() +
@@ -164,6 +163,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
                     self.create_words_list_logic_class.EMPTY_LIST)
                 self.create_words_list_logic_class.set_name_actual_select_file(
                     self.create_words_list_logic_class.NOTHING_SELECTED)
+                self.label_currently_selected_word_var_initial_state()
                 self.set_table()
         else:
             self.info_popup(
@@ -179,19 +179,25 @@ class CreateWordsListGUI(CreateWordsListLogic):
             self.info_popup(
                 self.create_words_list_logic_class.check_is_empty_repeat_field(self.widget_entry_polish_word.get(),
                                                                                self.widget_entry_english_word.get()))
-            self.set_value_table()
+            if self.create_words_list_logic_class.added_new_words:
+                self.create_words_list_logic_class.set_added_new_words(False)
+                self.clean_previous_data_from_table()
+                self.widget_entry_polish_word.delete(0, 'end')
+                self.widget_entry_english_word.delete(0, 'end')
+                self.set_value_table()
         else:
             self.info_popup([self.ERROR, "You must first select which list."])
 
     def button_remove_tmp_add_words_from_list(self):
         butt_remove = Button(self.create_words_list_logic, text="Remove word",
-                             command=lambda: [
-                                 self.remove_words(),
-                                 self.set_table(),
-                                 self.set_value_table(),
-                                 self.info_popup(self.create_words_list_logic_class.remove_word_from_lists())
-                             ])
+                             command=self.logic_to_use_button_remove_selected_word)
         butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
+
+    def logic_to_use_button_remove_selected_word(self):
+        self.remove_words()
+        self.set_table()
+        self.set_value_table()
+        self.info_popup(self.create_words_list_logic_class.remove_word_from_lists())
 
     def button_find_words_in_actual_chooser_list(self):
         butt_find = Button(self.create_words_list_logic, text="Find",
@@ -205,7 +211,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
                                self.main_menu_root))
         butt_back.grid(row=4, column=0, ipadx=25, pady=25)
 
-    def button_save_a_list__with_new_added_words(self):
+    def button_save_a_list_with_new_added_words(self):
         butt_save = Button(self.create_words_list_logic, text="Save words")
         butt_save.grid(row=4, column=4, ipadx=70, pady=0)
 
@@ -222,8 +228,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
 
     def remove_words(self):
         clicked_elem = ('<Double-1>', self.on_select)
-        print(clicked_elem)
-        # self.table_with_headers.bind('<Double-1>', self.on_select)
+        self.table_with_headers.bind('<Double-1>', self.on_select)
 
     def set_table(self):
         self.table_with_headers = ttk.Treeview(self.create_words_list_logic, selectmode='browse')
@@ -245,10 +250,12 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.table_with_headers.heading("3", text="English word")
         self.table_with_headers.bind('<Double-1>', self.on_select)
 
-    def add_new_word_from_table(self):
-        # self.table_with_headers.insert("", 'end',
-        #                                values=self.create_words_list_logic_class.return_words_line(counter))
-        pass
+    def label_displays_actual_selected_word(self):
+        self.label_currently_selected_word = Label(self.create_words_list_logic,
+                                                   textvariable=self.label_currently_selected_word_var,
+                                                   fg="dark green", font='Helvetica 15 bold', padx=2, anchor='w')
+        self.label_currently_selected_word.config(width=40)
+        self.label_currently_selected_word.grid(row=3, column=4, columnspan=2, sticky=E)
 
     def set_value_table(self):
         for counter in range(0, self.create_words_list_logic_class.get_converted_words_from_selected_list().__len__(),
@@ -280,6 +287,14 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def on_select(self, event):
         cur_item = self.table_with_headers.focus()
         self.create_words_list_logic_class.convert_value_from_table_to_remove(self.table_with_headers.item(cur_item))
+        print(self.create_words_list_logic_class.get_convert_value_from_click_table_event())
+        self.label_currently_selected_word_var.set(
+            self.create_words_list_logic_class.get_convert_by_view_value_from_click_table_event())
+
+    def label_currently_selected_word_var_initial_state(self):
+        self.label_currently_selected_word_var.set(
+            self.create_words_list_logic_class.set_actual_selected_words() +
+            self.create_words_list_logic_class.NOTHING_SELECTED)
 
     def close_words_window(self):
         self.create_words_list_logic.destroy()

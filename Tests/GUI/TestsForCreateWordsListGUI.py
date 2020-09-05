@@ -164,8 +164,7 @@ class TestsForCreateWordsListGui:
         list_before_adding_words.append([self.polish_example_add_word[rand_word]])
         list_before_adding_words.append([self.english_example_add_word[rand_word]])
 
-        result1 = self.create_words_list_logic.adding_word_for_list(counter,
-                                                                    [self.polish_example_add_word[rand_word]],
+        result1 = self.create_words_list_logic.add_new_word_to_list(counter, [self.polish_example_add_word[rand_word]],
                                                                     [self.english_example_add_word[rand_word]])
         result1_1 = self.create_words_list_logic.get_converted_words_from_selected_list()
 
