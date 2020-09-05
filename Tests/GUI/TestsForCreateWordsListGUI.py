@@ -114,7 +114,7 @@ class TestsForCreateWordsListGui:
         self.create_words_list_logic.set_name_actual_select_file(list_set_name_actual_select_file[0])
         self.create_words_list_logic.all_words_in_select_list.clear()
         random_word = randint(0, self.polish_example_words_list.__len__() - 1)
-        self.create_words_list_logic.set_all_words_in_select_list(
+        self.create_words_list_logic.set_converted_words_from_selected_list(
             self.mixing_place_words_in_polish_english_words_list(self.polish_example_words_list.copy(),
                                                                  self.english_example_words_list.copy()))
 
@@ -158,9 +158,9 @@ class TestsForCreateWordsListGui:
         """
 
         rand_word = randint(0, self.polish_example_add_word.__len__() - 1)
-        self.create_words_list_logic.set_all_words_in_select_list([])
-        counter = int(self.create_words_list_logic.get_all_words_in_select_list().__len__() / 3 + 1)
-        list_before_adding_words = self.create_words_list_logic.get_all_words_in_select_list()
+        self.create_words_list_logic.set_converted_words_from_selected_list([])
+        counter = int(self.create_words_list_logic.get_converted_words_from_selected_list().__len__() / 3 + 1)
+        list_before_adding_words = self.create_words_list_logic.get_converted_words_from_selected_list()
         list_before_adding_words.append(counter)
         list_before_adding_words.append([self.polish_example_add_word[rand_word]])
         list_before_adding_words.append([self.english_example_add_word[rand_word]])
@@ -168,7 +168,7 @@ class TestsForCreateWordsListGui:
         result1 = self.create_words_list_logic.adding_word_for_list(counter,
                                                                     [self.polish_example_add_word[rand_word]],
                                                                     [self.english_example_add_word[rand_word]])
-        result1_1 = self.create_words_list_logic.get_all_words_in_select_list()
+        result1_1 = self.create_words_list_logic.get_converted_words_from_selected_list()
 
         assert result1 == [self.create_words_list_logic.INFORMATION, "Adding new word to list"]
         assert result1_1 == list_before_adding_words

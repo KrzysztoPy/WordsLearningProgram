@@ -11,14 +11,15 @@ class CreateWordsListLogic:
     ERROR = 'Error'
     INFORMATION = 'Information'
     SAVE = 'Save'
+    EMPTY_FILE = "Empty"
 
     WITHOUT_ERROR = "Without error"
-    dir_with_words_list = "Words list"
+    dir_with_converted_words_list = "Words list"
     name_actual_select_file = "None"
 
     actual_state_popup = [WITHOUT_ERROR, "All rights"]
 
-    list_all_words_list = []
+    list_all_converted_words_list = []
     all_words_in_select_list = []
     # list_with_new_adding_words = []
     actual_adding_word = []
@@ -26,9 +27,11 @@ class CreateWordsListLogic:
 
     convert_value_from_click_table_event = []
 
-    def clear_words_list_name(self, entry_tkinter):
+    # New -> add_new_converted_words_list
+    def clear_converted_words_list_name(self, entry_tkinter):
         entry_tkinter.delete(0, 'end')
 
+    # New -> add_new_converted_words_list
     def check_whether_exists_file_with_the_same_name(self, new_name_a_file):
 
         if new_name_a_file == "":
@@ -40,7 +43,7 @@ class CreateWordsListLogic:
         else:
             return (["All right", "Don't exsist file with the same name", False])
 
-    def save_new_words_list(self, words=[]):
+    def save_new_converted_words_list(self, words=[]):
         return words.__len__() < 1
 
     def xyz(self):
@@ -55,7 +58,7 @@ class CreateWordsListLogic:
             create.write(os.path.dirname(os.path.realpath(__file__)))
             create.close()
 
-    def words_list_path(self):
+    def converted_words_list_path(self):
         tmp_path = (Path(__file__).parent.absolute()).__str__()
 
         for i in tmp_path[::-1]:
@@ -64,9 +67,10 @@ class CreateWordsListLogic:
             else:
                 tmp_path = tmp_path[:-1]
 
-        tmp_path += self.dir_with_words_list
+        tmp_path += self.dir_with_converted_words_list
         return tmp_path
 
+    # New -> add_new_converted_words_list
     def create_new_empty_list(self, file_name_txt):
         return File_Oper.create_new_empty_list(file_name_txt)
 
@@ -85,16 +89,16 @@ class CreateWordsListLogic:
             file_name = file_name[::-1]
             return file_name + ".txt"
 
-    def get_list_name_words_lists(self):
+    def get_list_name_converted_words_lists(self):
 
         if not self.actual_state_popup_diff_from_error():
-            self.list_all_words_list = File_Oper.return_lists_file_in_path(
+            self.list_all_converted_words_list = File_Oper.return_lists_file_in_path(
                 File_Oper.get_path_to_folder_with_words_lists())
-            # self.list_all_words_list = os.listdir((File_Oper.get_path_to_folder_with_words_lists()))
+            # self.list_all_converted_words_list = os.listdir((File_Oper.get_path_to_folder_with_converted_words_lists()))
 
-            if self.list_all_words_list.__len__() == 0:
-                self.list_all_words_list.append("Empty")
-            return self.list_all_words_list
+            if self.list_all_converted_words_list.__len__() == 0:
+                self.list_all_converted_words_list.append(self.EMPTY_FILE)
+            return self.list_all_converted_words_list
 
     def file_create(self, file_name):
         file_name_txt = "\\" + file_name + ".txt"
@@ -108,24 +112,30 @@ class CreateWordsListLogic:
         else:
             return self.create_new_empty_list(file_name_txt)
 
-    def open_file_and_return_words_list(self, file_name):
-        list_words = File_Oper.open_file_and_get_content(
+    def open_file_and_return_converted_words_list(self, file_name):
+        retrieved_data_from_list_words = File_Oper.open_file_and_get_content(
             File_Oper.get_path_to_folder_with_words_lists() + "\\" + file_name)
-        data_from_file = list_words.read()
-        file_data = "".join(data_from_file)
-        return self.set_list_with_words_from_file(file_data)
 
-    def actual_select_file_string_set(self, file_name):
+        data_from_file = retrieved_data_from_list_words.read()
+        file_data = "".join(data_from_file)
+
+        return self.convert_input_data_for_needs_program(file_data)
+
+    def set_actual_selected_file_string(self, file_name):
         self.set_name_actual_select_file(file_name)
         return "Actual select file: " + file_name
 
     def remove_button(self, file_name):
-        tmp_path = self.words_list_path() + "\\" + file_name
+        tmp_path = self.converted_words_list_path() + "\\" + file_name
         os.remove(tmp_path)
 
-    def set_list_with_words_from_file(self, file_data):
+    def convert_input_data_for_needs_program(self, file_data):
+        """
 
-        words_list = []
+        :param file_data: don't convert data from selected file
+        :return:
+        """
+        converted_words_list = []
         flag = FALSE
         polish_words = ""
         polish_all_translations = []
@@ -152,7 +162,7 @@ class CreateWordsListLogic:
                     english_words += j
             elif j == ";":
                 english_all_translations.append(english_words)
-                words_list += [counter, polish_all_translations.copy(), english_all_translations.copy()]
+                converted_words_list += [counter, polish_all_translations.copy(), english_all_translations.copy()]
                 counter += 1
 
                 flag = FALSE
@@ -160,9 +170,10 @@ class CreateWordsListLogic:
                 polish_all_translations.clear()
                 english_words = ""
                 english_all_translations.clear()
-        self.set_all_words_in_select_list(words_list.copy())
+
+        self.set_converted_words_from_selected_list(converted_words_list.copy())
         self.set_which_whatever_lists_is_load(True)
-        return self.get_all_words_in_select_list()
+        return self.get_converted_words_from_selected_list()
 
     def set_which_whatever_lists_is_load(self, which_load_list):
         self.which_whatever_lists_is_load = which_load_list
@@ -173,16 +184,15 @@ class CreateWordsListLogic:
     def set_actual_selected_file(self):
         return self.INITIAL_STATE
 
-    def return_words_line(self, counter):
-        tmp_all_words_on_selected_list = self.get_all_words_in_select_list()
+    def return_separated_individual_elem(self, counter):
+        return (self.get_converted_words_from_selected_list()[counter],
+                ",".join(self.get_converted_words_from_selected_list()[counter + 1]),
+                ",".join(self.get_converted_words_from_selected_list()[counter + 2]))
 
-        return (tmp_all_words_on_selected_list[counter], ",".join(tmp_all_words_on_selected_list[counter + 1]),
-                ",".join(tmp_all_words_on_selected_list[counter + 2]))
-
-    def set_all_words_in_select_list(self, all_words_from_selected_list):
+    def set_converted_words_from_selected_list(self, all_words_from_selected_list):
         self.all_words_in_select_list = all_words_from_selected_list.copy()
 
-    def get_all_words_in_select_list(self):
+    def get_converted_words_from_selected_list(self):
         return self.all_words_in_select_list.copy()
 
     def set_list_with_old_and_new_words(self, set_list_with_old_and_new_words):
@@ -284,11 +294,11 @@ class CreateWordsListLogic:
 
     def adding_word_for_list(self, counter, polish_word, english_word):
 
-        tmp_all_words = self.get_all_words_in_select_list()
+        tmp_all_words = self.get_converted_words_from_selected_list()
         tmp_all_words.append(counter)
         tmp_all_words.append(polish_word)
         tmp_all_words.append(english_word)
-        self.set_all_words_in_select_list(tmp_all_words.copy())
+        self.set_converted_words_from_selected_list(tmp_all_words.copy())
         return [self.INFORMATION, "Adding new word to list"]
 
     def check_change(self, polish_word, english_word):
@@ -320,7 +330,7 @@ class CreateWordsListLogic:
         if not self.convert_value_from_click_table_event:
             return [self.ERROR, "You didn't choose element which you want remove. Please try again."]
 
-        copy_all_words_in_select_list = (self.get_all_words_in_select_list()).copy()
+        copy_all_words_in_select_list = (self.get_converted_words_from_selected_list()).copy()
         for i in self.all_words_in_select_list:
             for j in self.convert_value_from_click_table_event:
 
@@ -328,19 +338,19 @@ class CreateWordsListLogic:
                     copy_all_words_in_select_list.remove(j)
                     break
 
-        self.set_all_words_in_select_list(copy_all_words_in_select_list.copy())
+        self.set_converted_words_from_selected_list(copy_all_words_in_select_list.copy())
         return self.changing_id_number()
 
     def changing_id_number(self):
 
-        tmp_all_words_in_select_list = self.get_all_words_in_select_list().copy()
+        tmp_all_words_in_select_list = self.get_converted_words_from_selected_list().copy()
         for counter in range(0, tmp_all_words_in_select_list.__len__(), 3):
             if counter == 0:
                 tmp_all_words_in_select_list[counter] = counter + 1
             else:
                 tmp_all_words_in_select_list[counter] = int((counter / 3) + 1)
 
-        self.set_all_words_in_select_list(tmp_all_words_in_select_list.copy())
+        self.set_converted_words_from_selected_list(tmp_all_words_in_select_list.copy())
         self.convert_value_from_click_table_event.clear()
         return [self.INFORMATION, "Remove word from table!!!"]
 
