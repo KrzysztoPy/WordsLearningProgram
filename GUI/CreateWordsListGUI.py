@@ -9,7 +9,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
     create_words_list_logic_class = CreateWordsListLogic()
     main_menu_root = None
 
-    create_words_list_logic = None
     list_words_name = None
     widget_option_menu = None
     actual_list_word_lists = []
@@ -41,7 +40,9 @@ class CreateWordsListGUI(CreateWordsListLogic):
         # New
         self.label_displays_name_word_list_file()
         self.label_widget_unchanging()
-        self.actual_select_file_string_var.set(self.create_words_list_logic_class.set_actual_selected_file())
+        self.actual_select_file_string_var.set(
+            self.create_words_list_logic_class.set_actual_selected_file() +
+            self.create_words_list_logic_class.NOTHING_SELECTED)
 
         # button New
         self.button_add_new_words_list()
@@ -52,7 +53,8 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.button_find_words_in_actual_chooser_list()
         self.button_back_to_earlier_menu()
         self.button_save_a_list__with_new_added_words()
-        self.create_words_list_logic_class.set_name_actual_select_file(self.create_words_list_logic_class.EMPTY_FILE)
+        self.create_words_list_logic_class.set_name_actual_select_file(
+            self.create_words_list_logic_class.NOTHING_SELECTED)
         # Old
         self.label_displays_actual_select_file()
 
@@ -125,15 +127,16 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.create_words_list_logic.grid_columnconfigure(butt_load, minsize=1)
 
     def logic_to_use_button_load_list(self):
-
-        if self.list_with_words_lists_name.get().__str__() != self.create_words_list_logic_class.EMPTY_FILE:
+        if self.create_words_list_logic_class.which_selected_some_list(self.list_with_words_lists_name.get()):
             self.create_words_list_logic_class.open_file_and_return_converted_words_list(
-                self.list_with_words_lists_name.get()),
-            self.clean_previous_data_from_table(),
-            self.set_value_table(),
+                self.list_with_words_lists_name.get())
+            self.clean_previous_data_from_table()
+            self.set_value_table()
+            self.create_words_list_logic_class.set_name_actual_select_file(
+                self.list_with_words_lists_name.get())
             self.actual_select_file_string_var.set(
-                self.create_words_list_logic_class.set_actual_selected_file_string(
-                    self.list_with_words_lists_name.get()))
+                (self.create_words_list_logic_class.INITIAL_STATE +
+                 self.create_words_list_logic_class.get_name_actual_select_file()))
         else:
             self.info_popup([self.ERROR, "List with words list are empty. You aren't load nothing!"])
 
@@ -143,32 +146,42 @@ class CreateWordsListGUI(CreateWordsListLogic):
         butt_remove.grid(row=1, column=5, columnspan=3, ipadx=70, pady=0)
 
     def logic_to_use_button_remove_list_with_word(self):
+        selected_file_to_remove = self.list_with_words_lists_name.get()
+        if self.create_words_list_logic_class.which_list_with_words_list_is_not_empty(selected_file_to_remove):
+            self.info_popup(self.create_words_list_logic_class.butt_remove_file(selected_file_to_remove))
 
-        if self.create_words_list_logic_class.get_name_actual_select_file() \
-                != self.create_words_list_logic_class.EMPTY_FILE:
-            self.set_table_with_headers(
-                self.create_words_list_logic_class.whether_remove_lists_is_selected(
-                    self.list_with_words_lists_name.get(), self.table_with_headers)),
-            # self.clean_previous_data_from_table(),
-            self.create_words_list_logic_class.remove_button(
-                self.list_with_words_lists_name.get()),
-            self.option_menu_widget_list_with_words_list(),
-
-            self.actual_select_file_string_var.set(
-                self.create_words_list_logic_class.set_actual_selected_file_string("None"))
+            # self.set_table_with_headers(
+            #     self.create_words_list_logic_class.whether_remove_lists_is_selected(
+            #         self.list_with_words_lists_name.get(), self.table_with_headers))
+            # self.create_words_list_logic_class.fi(
+            #     self.list_with_words_lists_name.get())
+            # self.option_menu_widget_list_with_words_list()
+            if self.create_words_list_logic_class.remove_list_which_is_load(selected_file_to_remove):
+                self.actual_select_file_string_var.set(
+                    self.create_words_list_logic_class.set_actual_selected_file() +
+                    self.create_words_list_logic_class.NOTHING_SELECTED)
+                self.create_words_list_logic_class.set_all_words_in_select_list(
+                    self.create_words_list_logic_class.EMPTY_LIST)
+                self.create_words_list_logic_class.set_name_actual_select_file(
+                    self.create_words_list_logic_class.NOTHING_SELECTED)
+                self.set_table()
         else:
             self.info_popup(
                 [self.ERROR, "You don't selected list for remove. First you must selected list and next remove."])
 
     def button_tmp_add_new_words_from_list(self):
         butt_add = Button(self.create_words_list_logic, text="Add words",
-                          command=lambda: [
-                              self.info_popup(
-                                  self.create_words_list_logic_class.whether_repeat_empty_field_and_no_selected_list(
-                                      self.widget_entry_polish_word.get(),
-                                      self.widget_entry_english_word.get())), self.set_value_table()
-                          ])
+                          command=self.logic_to_use_button_add_new_word)
         butt_add.grid(row=2, column=4, ipadx=10, pady=25)
+
+    def logic_to_use_button_add_new_word(self):
+        if self.create_words_list_logic_class.which_list_with_words_list_is_not_empty():
+            self.info_popup(
+                self.create_words_list_logic_class.check_is_empty_repeat_field(self.widget_entry_polish_word.get(),
+                                                                               self.widget_entry_english_word.get()))
+            self.set_value_table()
+        else:
+            self.info_popup([self.ERROR, "You must first select which list."])
 
     def button_remove_tmp_add_words_from_list(self):
         butt_remove = Button(self.create_words_list_logic, text="Remove word",
@@ -245,10 +258,13 @@ class CreateWordsListGUI(CreateWordsListLogic):
                                                counter))
 
     def clean_previous_data_from_table(self):
-        self.table_with_headers.delete(*self.table_with_headers.get_children())
+        self.get_set_table_with_headers().delete(*self.get_set_table_with_headers().get_children())
 
     def set_table_with_headers(self, table_with_headers):
         self.table_with_headers = table_with_headers
+
+    def get_set_table_with_headers(self):
+        return self.table_with_headers
 
     def info_popup(self, info_list):
         if info_list[0] == self.create_words_list_logic_class.ERROR:
@@ -265,7 +281,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
         cur_item = self.table_with_headers.focus()
         self.create_words_list_logic_class.convert_value_from_table_to_remove(self.table_with_headers.item(cur_item))
 
-    # def close_words_window(self):
-    #     self.create_words_list_logic.destroy()
-    #     self.main_menu_root.destroy()
-    #     exit()
+    def close_words_window(self):
+        self.create_words_list_logic.destroy()
+        self.main_menu_root.destroy()
+        exit()

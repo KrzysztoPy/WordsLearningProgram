@@ -70,8 +70,8 @@ class TestsForCreateWordsListGui:
             :polish_english_word[1]:      List "English word"
         """
         # create_words_list_logic.set_name_actual_select_file("")
-        result = self.create_words_list_logic.whether_repeat_empty_field_and_no_selected_list(polish_english_word[0],
-                                                                                              polish_english_word[1])
+        result = self.create_words_list_logic.check_is_empty_repeat_field(polish_english_word[0],
+                                                                          polish_english_word[1])
         assert result == [self.create_words_list_logic.ERROR, 'You must choice any file!']
 
         # Test 2:
@@ -84,8 +84,8 @@ class TestsForCreateWordsListGui:
         """
         self.create_words_list_logic.set_name_actual_select_file(list_set_name_actual_select_file[0])
         # print(create_words_list_logic.get_name_actual_select_file())
-        result = self.create_words_list_logic.whether_repeat_empty_field_and_no_selected_list(polish_english_word[0],
-                                                                                              polish_english_word[1])
+        result = self.create_words_list_logic.check_is_empty_repeat_field(polish_english_word[0],
+                                                                          polish_english_word[1])
         assert result == [self.create_words_list_logic.ERROR, "Musisz wpisać polską wersje słowa."]
 
         # Test 3
@@ -98,8 +98,8 @@ class TestsForCreateWordsListGui:
         """
 
         self.create_words_list_logic.set_name_actual_select_file(list_set_name_actual_select_file[0])
-        result = self.create_words_list_logic.whether_repeat_empty_field_and_no_selected_list(polish_english_word[2],
-                                                                                              polish_english_word[3])
+        result = self.create_words_list_logic.check_is_empty_repeat_field(polish_english_word[2],
+                                                                          polish_english_word[3])
         assert result == [self.create_words_list_logic.ERROR, "You must writing english word version."]
 
         # Test 4
@@ -118,9 +118,8 @@ class TestsForCreateWordsListGui:
             self.mixing_place_words_in_polish_english_words_list(self.polish_example_words_list.copy(),
                                                                  self.english_example_words_list.copy()))
 
-        result = self.create_words_list_logic.whether_repeat_empty_field_and_no_selected_list(
-            self.polish_example_words_list[random_word],
-            self.english_example_words_list[random_word])
+        result = self.create_words_list_logic.check_is_empty_repeat_field(self.polish_example_words_list[random_word],
+                                                                          self.english_example_words_list[random_word])
 
         size_get_name_actual_select_file = self.create_words_list_logic.get_name_actual_select_file()
 
@@ -144,8 +143,8 @@ class TestsForCreateWordsListGui:
 
         self.create_words_list_logic.set_name_actual_select_file = list_set_name_actual_select_file[0]
         self.create_words_list_logic.set_name_actual_select_file = "noNone"
-        result = self.create_words_list_logic.whether_repeat_empty_field_and_no_selected_list(polish_english_word[6],
-                                                                                              polish_english_word[7])
+        result = self.create_words_list_logic.check_is_empty_repeat_field(polish_english_word[6],
+                                                                          polish_english_word[7])
 
         assert result == [self.create_words_list_logic.INFORMATION, "Adding new word to list"]
 

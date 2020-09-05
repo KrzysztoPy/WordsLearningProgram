@@ -6,6 +6,7 @@ import LOGIC.MainMenuLogic
 ERROR = 'Error'
 INFORMATION = 'Information'
 SAVE = 'Save'
+REMOVE = "Remove"
 
 
 def get_your_actual_path():
@@ -49,3 +50,11 @@ def return_lists_file_in_path(path):
 
 def open_file_and_get_content(path):
     return open(path, "r", encoding="utf=8")
+
+
+def remove_file(file_name):
+    try:
+        os.remove(get_path_to_folder_with_words_lists() + "\\" + file_name)
+        return [INFORMATION, "{} has been removed".format(file_name)]
+    except IOError as message_exception:
+        return [ERROR, str(message_exception), False]

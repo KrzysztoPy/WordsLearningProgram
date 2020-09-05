@@ -7,24 +7,23 @@ import os
 
 
 class CreateWordsListLogic:
-    INITIAL_STATE = "Actual select file: None"
+    NOTHING_SELECTED = "Nothing"
+    INITIAL_STATE = "Actual select file: "
     ERROR = 'Error'
     INFORMATION = 'Information'
     SAVE = 'Save'
     EMPTY_FILE = "Empty"
-
+    EMPTY_LIST = []
     WITHOUT_ERROR = "Without error"
+
     dir_with_converted_words_list = "Words list"
-    name_actual_select_file = "None"
+    name_actual_select_file = NOTHING_SELECTED
 
     actual_state_popup = [WITHOUT_ERROR, "All rights"]
 
     list_all_converted_words_list = []
     all_words_in_select_list = []
-    # list_with_new_adding_words = []
     actual_adding_word = []
-    which_whatever_lists_is_load = False
-
     convert_value_from_click_table_event = []
 
     # New -> add_new_converted_words_list
@@ -42,33 +41,6 @@ class CreateWordsListLogic:
             return (["Error", "A file with this name already exists. Choice different name. ", True])
         else:
             return (["All right", "Don't exsist file with the same name", False])
-
-    def save_new_converted_words_list(self, words=[]):
-        return words.__len__() < 1
-
-    def xyz(self):
-        pass
-
-    def whether_empty(self):
-        try:
-            check_empty = open('r', "path.txt")
-
-        except FileNotFoundError:
-            create = open('w', "path.txt")
-            create.write(os.path.dirname(os.path.realpath(__file__)))
-            create.close()
-
-    def converted_words_list_path(self):
-        tmp_path = (Path(__file__).parent.absolute()).__str__()
-
-        for i in tmp_path[::-1]:
-            if i == "\\":
-                break
-            else:
-                tmp_path = tmp_path[:-1]
-
-        tmp_path += self.dir_with_converted_words_list
-        return tmp_path
 
     # New -> add_new_converted_words_list
     def create_new_empty_list(self, file_name_txt):
@@ -90,15 +62,12 @@ class CreateWordsListLogic:
             return file_name + ".txt"
 
     def get_list_name_converted_words_lists(self):
+        self.set_list_all_converted_words_list(File_Oper.return_lists_file_in_path(
+            File_Oper.get_path_to_folder_with_words_lists()))
 
-        if not self.actual_state_popup_diff_from_error():
-            self.list_all_converted_words_list = File_Oper.return_lists_file_in_path(
-                File_Oper.get_path_to_folder_with_words_lists())
-            # self.list_all_converted_words_list = os.listdir((File_Oper.get_path_to_folder_with_converted_words_lists()))
-
-            if self.list_all_converted_words_list.__len__() == 0:
-                self.list_all_converted_words_list.append(self.EMPTY_FILE)
-            return self.list_all_converted_words_list
+        if not self.get_list_all_converted_words_list():
+            self.set_list_all_converted_words_list([self.EMPTY_FILE])
+        return self.list_all_converted_words_list
 
     def file_create(self, file_name):
         file_name_txt = "\\" + file_name + ".txt"
@@ -119,17 +88,12 @@ class CreateWordsListLogic:
         data_from_file = retrieved_data_from_list_words.read()
         file_data = "".join(data_from_file)
 
-        return self.convert_input_data_for_needs_program(file_data)
+        return self.convert_input_data_for_needs_program(file_data, file_name)
 
-    def set_actual_selected_file_string(self, file_name):
-        self.set_name_actual_select_file(file_name)
-        return "Actual select file: " + file_name
+    def butt_remove_file(self, file_name):
+        return File_Oper.remove_file(file_name)
 
-    def remove_button(self, file_name):
-        tmp_path = self.converted_words_list_path() + "\\" + file_name
-        os.remove(tmp_path)
-
-    def convert_input_data_for_needs_program(self, file_data):
+    def convert_input_data_for_needs_program(self, file_data, file_name):
         """
 
         :param file_data: don't convert data from selected file
@@ -172,14 +136,8 @@ class CreateWordsListLogic:
                 english_all_translations.clear()
 
         self.set_converted_words_from_selected_list(converted_words_list.copy())
-        self.set_which_whatever_lists_is_load(True)
+        self.set_name_actual_select_file(file_name)
         return self.get_converted_words_from_selected_list()
-
-    def set_which_whatever_lists_is_load(self, which_load_list):
-        self.which_whatever_lists_is_load = which_load_list
-
-    def get_which_whatever_lists_is_load(self):
-        return self.which_whatever_lists_is_load
 
     def set_actual_selected_file(self):
         return self.INITIAL_STATE
@@ -251,15 +209,16 @@ class CreateWordsListLogic:
 
         return list_polish_words, list_english_words
 
-    def whether_repeat_empty_field_and_no_selected_list(self, polish_words, english_words):
+    def check_is_empty_repeat_field(self, polish_words, english_words):
         polish_repeated = 0
         english_repeated = 0
         polish_repeat = False
         english_repeat = False
 
-        internal_check_fields_is_not_empty = self.check_fields_is_not_empty(polish_words, english_words)
-        if internal_check_fields_is_not_empty[0] != "Error":
+        check_fields_is_not_empty = self.check_fields_is_not_empty(polish_words, english_words)
+        if check_fields_is_not_empty[0] != "Error":
             list_polish_words, list_english_words = self.entry_words_separation(polish_words, english_words)
+
             if self.all_words_in_select_list:
                 for counter in range(0, self.all_words_in_select_list.__len__(), 3):
                     for words in self.all_words_in_select_list[counter + 1]:
@@ -290,7 +249,7 @@ class CreateWordsListLogic:
                 return self.adding_word_for_list(
                     int(self.all_words_in_select_list.__len__() / 3) + 1, [polish_words], [english_words])
         else:
-            return internal_check_fields_is_not_empty
+            return check_fields_is_not_empty
 
     def adding_word_for_list(self, counter, polish_word, english_word):
 
@@ -358,6 +317,12 @@ class CreateWordsListLogic:
         if self.get_name_actual_select_file() == actual_selected_list:
             return table_with_headers.delete.delete(*table_with_headers.get_children())
 
+    def remove_list_which_is_load(self, actual_selected_list):
+        print(self.get_name_actual_select_file())
+        print(actual_selected_list)
+        print(self.get_name_actual_select_file() == actual_selected_list)
+        return self.get_name_actual_select_file().__str__() == actual_selected_list
+
     def remove_data_from_table(self, table_with_headers):
         return table_with_headers.delete.delete(*table_with_headers.get_children())
 
@@ -372,6 +337,24 @@ class CreateWordsListLogic:
 
     def get_message_cons_save(self):
         return self.SAVE
+
+    def set_all_words_in_select_list(self, all_words_in_select_list):
+        self.all_words_in_select_list = all_words_in_select_list
+
+    def get_all_words_in_select_list(self):
+        return self.all_words_in_select_list
+
+    def which_selected_some_list(self, list_with_words_lists_name):
+        return list_with_words_lists_name.__str__() != self.EMPTY_FILE
+
+    def which_list_with_words_list_is_not_empty(self, selected_file_to_remove):
+        return selected_file_to_remove != self.EMPTY_FILE
+
+    def set_list_all_converted_words_list(self, list_all_converted_words_list):
+        self.list_all_converted_words_list = list_all_converted_words_list
+
+    def get_list_all_converted_words_list(self) -> []:
+        return self.list_all_converted_words_list
 
     def save_to_table(self, polish_word, english_word):
         # tmp_words = []
@@ -391,18 +374,12 @@ class CreateWordsListLogic:
         # tmp_words.append(english_word)
         return ["Save", "The word has been added to the list", self.all_words_in_select_list.copy()]
 
-    def remove_word(self):
-        pass
-
     def find_word(self):
         pass
 
     def close_words_window(self, top_window, main_window):
         top_window.destroy()
         main_window.deiconify()
-
-    def actual_state_popup_diff_from_error(self):
-        return self.actual_state_popup == self.ERROR
 
     # def test():
     #     # logic = Logic()
