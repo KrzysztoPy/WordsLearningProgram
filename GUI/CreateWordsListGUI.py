@@ -22,6 +22,8 @@ class CreateWordsListGUI(CreateWordsListLogic):
     label_currently_open_folder = None
     label_currently_open_file = None
 
+    currently_clicked_item = {}
+
     def size_and_position_main_window(self, main_menu_root):
         main_window_width = 1400
         main_window_height = 600
@@ -54,9 +56,8 @@ class CreateWordsListGUI(CreateWordsListLogic):
         self.button_remove_words_list()
         self.button_tmp_add_new_words_from_list()
         self.button_remove_tmp_add_words_from_list()
-        self.button_find_words_in_actual_chooser_list()
         self.button_back_to_earlier_menu()
-        self.button_save_a_list_with_new_added_words()
+
         self.create_words_list_logic_class.set_name_actual_select_file(
             self.create_words_list_logic_class.NOTHING_SELECTED)
         self.label_displays_actual_selected_word()
@@ -69,6 +70,7 @@ class CreateWordsListGUI(CreateWordsListLogic):
         # Set windows close event
         self.create_words_list_logic.protocol("WM_DELETE_WINDOW", self.close_words_window)
         self.set_table()
+        self.button_save_a_list_with_new_added_words()
 
     def label_displays_name_word_list_file(self):
 
@@ -172,10 +174,11 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def button_tmp_add_new_words_from_list(self):
         butt_add = Button(self.create_words_list_logic, text="Add words",
                           command=self.logic_to_use_button_add_new_word)
-        butt_add.grid(row=2, column=4, ipadx=10, pady=25)
+        butt_add.grid(row=2, column=4, ipadx=65, pady=25)
 
     def logic_to_use_button_add_new_word(self):
-        if self.create_words_list_logic_class.which_list_with_words_list_is_not_empty():
+        if self.create_words_list_logic_class.which_list_with_words_list_is_not_empty(
+                self.create_words_list_logic_class.get_name_actual_select_file()):
             self.info_popup(
                 self.create_words_list_logic_class.check_is_empty_repeat_field(self.widget_entry_polish_word.get(),
                                                                                self.widget_entry_english_word.get()))
@@ -191,18 +194,18 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def button_remove_tmp_add_words_from_list(self):
         butt_remove = Button(self.create_words_list_logic, text="Remove word",
                              command=self.logic_to_use_button_remove_selected_word)
-        butt_remove.grid(row=2, column=5, ipadx=10, pady=25)
+        butt_remove.grid(row=2, column=5, ipadx=105, pady=25)
 
     def logic_to_use_button_remove_selected_word(self):
-        self.remove_words()
-        self.set_table()
-        self.set_value_table()
-        self.info_popup(self.create_words_list_logic_class.remove_word_from_lists())
-
-    def button_find_words_in_actual_chooser_list(self):
-        butt_find = Button(self.create_words_list_logic, text="Find",
-                           command=self.create_words_list_logic_class.find_word)
-        butt_find.grid(row=2, column=6, ipadx=10, pady=25)
+        if self.get_currently_clicked_item():
+            if self.create_words_list_logic_class.get_all_words_in_select_list():
+                self.create_words_list_logic_class.decrementation_id()
+                self.create_words_list_logic_class.remove_words_from_list()
+                self.set_table()
+                self.set_value_table()
+                self.label_currently_selected_word_var_initial_state()
+                self.set_currently_clicked_item({})
+            # self.info_popup(self.create_words_list_logic_class.remove_word_from_lists())
 
     def button_back_to_earlier_menu(self):
         butt_back = Button(self.create_words_list_logic, text="Back",
@@ -212,8 +215,13 @@ class CreateWordsListGUI(CreateWordsListLogic):
         butt_back.grid(row=4, column=0, ipadx=25, pady=25)
 
     def button_save_a_list_with_new_added_words(self):
-        butt_save = Button(self.create_words_list_logic, text="Save words")
+        butt_save = Button(self.create_words_list_logic, text="Save words",
+                           command=self.logic_to_use_button_save_words_to_file)
         butt_save.grid(row=4, column=4, ipadx=70, pady=0)
+
+    def logic_to_use_button_save_words_to_file(self):
+        self.info_popup(
+            self.create_words_list_logic_class.save_words_to_file(self.list_with_words_lists_name.get()))
 
     def field_widget(self):
 
@@ -225,10 +233,6 @@ class CreateWordsListGUI(CreateWordsListLogic):
 
         self.widget_entry_english_word = Entry(self.create_words_list_logic, width=25, bd=5)
         self.widget_entry_english_word.grid(row=2, column=3, ipadx=25, pady=25)
-
-    def remove_words(self):
-        clicked_elem = ('<Double-1>', self.on_select)
-        self.table_with_headers.bind('<Double-1>', self.on_select)
 
     def set_table(self):
         self.table_with_headers = ttk.Treeview(self.create_words_list_logic, selectmode='browse')
@@ -253,9 +257,9 @@ class CreateWordsListGUI(CreateWordsListLogic):
     def label_displays_actual_selected_word(self):
         self.label_currently_selected_word = Label(self.create_words_list_logic,
                                                    textvariable=self.label_currently_selected_word_var,
-                                                   fg="dark green", font='Helvetica 15 bold', padx=2, anchor='w')
+                                                   fg="dark green", font='Helvetica 15 bold', padx=2, anchor='n')
         self.label_currently_selected_word.config(width=40)
-        self.label_currently_selected_word.grid(row=3, column=4, columnspan=2, sticky=E)
+        self.label_currently_selected_word.grid(row=3, column=4, columnspan=2, sticky=W)
 
     def set_value_table(self):
         for counter in range(0, self.create_words_list_logic_class.get_converted_words_from_selected_list().__len__(),
@@ -285,16 +289,26 @@ class CreateWordsListGUI(CreateWordsListLogic):
             messagebox.showinfo(info_list[0], info_list[1])
 
     def on_select(self, event):
-        cur_item = self.table_with_headers.focus()
-        self.create_words_list_logic_class.convert_value_from_table_to_remove(self.table_with_headers.item(cur_item))
-        print(self.create_words_list_logic_class.get_convert_value_from_click_table_event())
-        self.label_currently_selected_word_var.set(
-            self.create_words_list_logic_class.get_convert_by_view_value_from_click_table_event())
+        self.currently_clicked_item = self.table_with_headers.focus()
+        print("Number to removed:")
+        if self.table_with_headers.item(self.currently_clicked_item).get("values"):
+            self.label_currently_selected_word_var.set(
+                self.create_words_list_logic_class.get_convert_by_view_value_from_click_table_event(
+                    self.table_with_headers.item(self.currently_clicked_item)))
+            self.create_words_list_logic_class.set_number_word_future_to_removed(
+                self.table_with_headers.item(self.currently_clicked_item).get("values")[0])
+            print(self.create_words_list_logic_class.get_number_in_list_words_will_be_removed())
 
     def label_currently_selected_word_var_initial_state(self):
         self.label_currently_selected_word_var.set(
             self.create_words_list_logic_class.set_actual_selected_words() +
             self.create_words_list_logic_class.NOTHING_SELECTED)
+
+    def get_currently_clicked_item(self):
+        return self.currently_clicked_item
+
+    def set_currently_clicked_item(self, currently_clicked_item):
+        self.currently_clicked_item = currently_clicked_item
 
     def close_words_window(self):
         self.create_words_list_logic.destroy()

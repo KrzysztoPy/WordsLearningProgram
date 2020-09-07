@@ -58,3 +58,15 @@ def remove_file(file_name):
         return [INFORMATION, "{} has been removed".format(file_name)]
     except IOError:
         return [ERROR, "The file you want to delete does not exist!", False]
+
+
+def save_data_to_file(file_name, data):
+    file_name = "\\" + file_name + ".txt"
+    tmp_path = get_path_to_folder_with_words_lists() + file_name
+    try:
+        file = open(tmp_path, "a")
+        file.write(data)
+        file.close()
+        return [INFORMATION, "List with words was save."]
+    except IOError as error:
+        return [ERROR, error]

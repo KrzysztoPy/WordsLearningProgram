@@ -28,6 +28,7 @@ class CreateWordsListLogic:
     convert_value_from_click_table_event = []
     new_adding_words_to_actual_list = []
     added_new_words = False
+    number_in_list_words_will_be_removed = None
 
     # New -> add_new_converted_words_list
     def clear_converted_words_list_name(self, entry_tkinter):
@@ -290,6 +291,9 @@ class CreateWordsListLogic:
             convert_value_from_table = self.set_actual_selected_words() + self.NOTHING_SELECTED
         self.set_convert_value_from_click_table_event(convert_value_from_table)
 
+    def new_convert_value_from_table_to_remove(self, removing_words):
+        pass
+
     def remove_word_from_lists(self):
         if not self.convert_value_from_click_table_event:
             return [self.ERROR, "You didn't choose element which you want remove. Please try again."]
@@ -317,6 +321,28 @@ class CreateWordsListLogic:
         self.set_converted_words_from_selected_list(tmp_all_words_in_select_list.copy())
         self.convert_value_from_click_table_event.clear()
         return [self.INFORMATION, "Remove word from table!!!"]
+
+    def save_words_to_file(self, file_name):
+
+        if self.get_name_actual_select_file() != self.NOTHING_SELECTED:
+            convered_data = self.convert_data()
+            return File_Oper.save_data_to_file(file_name, convered_data)
+        else:
+            return [self.ERROR, "You can't save empty list."]
+
+    def convert_data(self):
+        all_words = self.get_all_words_in_select_list()
+        converted_words = ""
+        converted_words_list = []
+
+        for counter in range(0, self.get_all_words_in_select_list().__len__(), 3):
+            converted_words += self.get_all_words_in_select_list[counter + 1] + "|"
+            print(converted_words)
+            converted_words += self.get_all_words_in_select_list[counter + 2] + ";\n"
+            print(converted_words)
+            converted_words_list.append(converted_words)
+            converted_words = ""
+        return converted_words_list
 
     def whether_remove_lists_is_selected(self, table_with_headers, actual_selected_list):
         if self.get_name_actual_select_file() == actual_selected_list:
@@ -376,79 +402,35 @@ class CreateWordsListLogic:
     def set_convert_value_from_click_table_event(self, convert_value_from_click_table_event):
         self.convert_value_from_click_table_event = convert_value_from_click_table_event
 
-    def get_convert_by_view_value_from_click_table_event(self):
-        copy_list = self.convert_value_from_click_table_event
-        copy_list = self.add_white_sign(copy_list, self.check_which_words_is_the_biggest(copy_list))
-        print(copy_list)
-        return "{:<} \n PL: {:<}  \n  Eng: {:<}".format(copy_list[0], "".join(copy_list[1]),
-                                                        "".join(copy_list[2]))
-        # return "{} \n PL: {}  \n  Eng: {}".format("", "".join(copy_list[1]),
-        #                                           "".join(copy_list[2]))
+    def get_convert_by_view_value_from_click_table_event(self, actual_clicked_elem):
+        # copy_list = self.convert_value_from_click_table_event
+        return f'Nr: {actual_clicked_elem.get("values")[0]:2d}\n PL: {actual_clicked_elem.get("values")[1]:10s}\n ' \
+               f'EN: {actual_clicked_elem.get("values")[2]:10s}\n'
 
-    def check_which_words_is_the_biggest(self, copy_list):
-        the_biggest = 0
-        print(copy_list.__len__())
-        for i in range(0, copy_list.__len__()):
-            if copy_list[i].__str__().__len__() > the_biggest:
-                the_biggest = copy_list[i].__str__().__len__()
-        return the_biggest
+    def decrementation_id(self):
+        for counter in range(self.get_number_in_list_words_will_be_removed() * 3,
+                             self.get_all_words_in_select_list().__len__(), 3):
+            self.get_all_words_in_select_list()[counter] -= 1
 
-    def add_white_sign(self, copy_list, the_biggest):
-        print("The biggest {}".format(the_biggest))
+    def remove_words_from_list(self):
+        remove_word_from_list = self.get_all_words_in_select_list()
+        if self.get_number_in_list_words_will_be_removed != 0:
+            for i in range(0, 3):
+                del remove_word_from_list[self.get_number_in_list_words_will_be_removed() * 3]
+            self.set_all_words_in_select_list(remove_word_from_list)
 
-        for i in range(0, copy_list.__len__()):
-            tmp = copy_list[i]
-            str(tmp)
-            print(type(tmp))
-            tmp += " " * (the_biggest - copy_list[i].__str__().__len__())
-            copy_list[i] = tmp
+    def set_number_word_future_to_removed(self, number_in_table):
+        self.set_number_in_list_words_will_be_removed(number_in_table - 1)
 
     def save_to_table(self, polish_word, english_word):
-        # tmp_words = []
-        # index = 0
-
-        # for counter in range(0, self.all_words_in_select_list.__len__() + 1, 3):
-        #     self.all_words_in_select_list[counter]
-        # if self.all_words_in_select_list.__len__() > 3:
-        #     index = int(tmp_actual_words[tmp_actual_words.__len__() - 3])
-        #     for i in range(0, tmp_actual_words.__len__(), 3):
-        #         tmp_words.append(tmp_actual_words[i])
-        #         tmp_words.append(tmp_actual_words[i + 1])
-        #         tmp_words.append(tmp_actual_words[i + 2])
-        #
-        # tmp_words.append(index + 1)
-        # tmp_words.append(polish_word)
-        # tmp_words.append(english_word)
         return ["Save", "The word has been added to the list", self.all_words_in_select_list.copy()]
 
-    def find_word(self):
-        pass
+    def get_number_in_list_words_will_be_removed(self):
+        return self.number_in_list_words_will_be_removed
+
+    def set_number_in_list_words_will_be_removed(self, number_in_list_words_will_be_removed):
+        self.number_in_list_words_will_be_removed = number_in_list_words_will_be_removed
 
     def close_words_window(self, top_window, main_window):
         top_window.destroy()
         main_window.deiconify()
-
-    # def test():
-    #     # logic = Logic()
-    #     # # rano|a.m.;około|about;
-    #     # logic.save_to_table("popołudniu", "afternoon", ["1", "rano", "a.m.", "2", "około", "about"])
-    #     # logic.load_butt("bla.txt")
-    #     # path = os.path.realpath(__file__)
-    #     # print(os.path.basename(__file__))
-    #     # print("\\")
-    #     #
-    #     # print(path)
-    #     # print(type(path))
-    #     # print(type(pathlib.Path(__file__).parent.absolute()))
-    #     # bla = "xyz"
-    #     # print("\\{}".format(bla))
-    #     pass
-    #     # print(type(path))
-    #     # print(path)
-    #     # path.mkdir()
-    #     # print(path)
-    #     # print(path.realpath(__file__))
-    #     # print(pathlib.Path(__file__))
-    #
-    #
-    # test()
