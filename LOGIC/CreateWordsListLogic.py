@@ -403,7 +403,6 @@ class CreateWordsListLogic:
         self.convert_value_from_click_table_event = convert_value_from_click_table_event
 
     def get_convert_by_view_value_from_click_table_event(self, actual_clicked_elem):
-        # copy_list = self.convert_value_from_click_table_event
         return f'Nr: {actual_clicked_elem.get("values")[0]:2d}\n PL: {actual_clicked_elem.get("values")[1]:10s}\n ' \
                f'EN: {actual_clicked_elem.get("values")[2]:10s}\n'
 
